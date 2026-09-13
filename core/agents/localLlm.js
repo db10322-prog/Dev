@@ -13,6 +13,18 @@ const MODEL_PATH = path.join(__dirname, "..", "..", "models", "qwen2.5-1.5b-inst
 
 let sessionPromise = null;
 
+// core/pipeline.js는 속도를 위해 여러 서브 에이전트(textBias, opinion 등)를 Promise.all로
+// 동시에 실행하는데, 로컬 모델은 CPU 하나로 실제 병렬 추론이 안 되고 컨텍스트의 시퀀스도
+// 한정돼 있어(기본 1개) 동시에 두 요청이 들어오면 "No sequences left"로 서로를 깨뜨린다
+// (실제로 재현됨). 그래서 로컬 모델 호출만 큐로 직렬화한다 — 클라우드 API(Mistral/Gemini/
+// Groq)는 이 큐를 안 타므로 병렬 이점을 그대로 유지한다.
+let queue = Promise.resolve();
+function enqueue(task) {
+  const result = queue.then(task, task);
+  queue = result.catch(() => {});
+  return result;
+}
+
 async function getSession() {
   if (sessionPromise) return sessionPromise;
   sessionPromise = (async () => {
@@ -34,7 +46,11 @@ async function getSession() {
 }
 
 /** Gemini/Groq와 동일한 인터페이스: JSON 스키마를 강제해 1회 생성. */
-async function callLocalLlmJson({ prompt, responseSchema }) {
+function callLocalLlmJson({ prompt, responseSchema }) {
+  return enqueue(() => runLocalLlmJson({ prompt, responseSchema }));
+}
+
+async function runLocalLlmJson({ prompt, responseSchema }) {
   const { llama, context } = await getSession();
   const { LlamaChatSession, LlamaJsonSchemaGrammar } = await import("node-llama-cpp");
 
