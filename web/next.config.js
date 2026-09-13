@@ -17,6 +17,13 @@ module.exports = {
       config.externals = config.externals || [];
       config.externals.push("node-llama-cpp");
     }
+    // Vercel은 Root Directory(web/)의 package.json만 보고 web/node_modules 에만 설치한다 —
+    // 리포 루트에는 아무것도 설치하지 않는다. core/agents/*.js 는 web/ 바깥(형제 디렉터리)에
+    // 있어서 Node의 기본 module 해석(요청 파일 위치에서 위로만 훑는 방식)으로는
+    // web/node_modules 를 절대 못 찾는다(실제로 "Module not found: node-fetch/jsdom/
+    // @mozilla/readability" 빌드 실패로 재현됨). 절대경로로 web/node_modules 를 추가
+    // 검색 경로에 넣어서, core/ 에서 하는 require든 어디서 하는 require든 항상 찾아지게 한다.
+    config.resolve.modules = [...(config.resolve.modules || []), path.join(__dirname, "node_modules")];
     return config;
   },
 };
