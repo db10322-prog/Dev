@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>뉴스 판별 에이전트 캐릭터</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; background: transparent; overflow: hidden;
+    font-family: -apple-system, "Malgun Gothic", sans-serif; user-select: none;
+  }
+  #stage { position: relative; width: 220px; height: 280px; }
+
+  /* 참고 이미지(둥근 흰색/검정 로봇 헤드 + 파란 링 눈)를 SVG로 재현한 캐릭터 */
+  #character {
+    position: absolute; bottom: 8px; right: 8px; width: 108px; height: 108px;
+    cursor: pointer; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes blink {
+    0%, 92%, 100% { opacity: 1; }
+    96% { opacity: .35; }
+  }
+  #character:hover .head { fill: #f5f6f8; }
+  #character.thinking .eye-ring { animation: pulse 0.8s ease-in-out infinite; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .4; }
+  }
+
+  .head { fill: #ffffff; stroke: #1c1f26; stroke-width: 2; transition: fill .15s; }
+  .visor { fill: #14161b; }
+  .eye-ring { fill: none; stroke: #2fd0ff; stroke-width: 5; animation: blink 4s infinite; }
+  .eye-ring.small { stroke-width: 4; }
+  .body-torso { fill: #ffffff; stroke: #1c1f26; stroke-width: 2; }
+  .joint { fill: #14161b; }
+  .accent { fill: #2fd0ff; }
+
+  #bubble {
+    position: absolute; bottom: 128px; right: 0; width: 210px;
+    background: #fff; border-radius: 16px; padding: 14px 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.16); font-size: 13px; color: #1c1f26;
+    display: none; line-height: 1.55;
+  }
+  #bubble.show { display: block; }
+  #bubble .actions { margin-top: 10px; display: flex; gap: 6px; justify-content: flex-end; align-items: center; }
+  #bubble button {
+    border: none; border-radius: 8px; padding: 7px 12px; font-size: 12px; cursor: pointer;
+    font-weight: 600;
+  }
+  #btn-accept { background: #3182f6; color: #fff; }
+  #btn-decline { background: #f2f4f6; color: #4e5968; }
+  #status { margin-top: 6px; font-size: 12px; color: #8b95a1; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bubble">
+    <div id="bubble-text">현재 페이지에 있는 기사 내용을 분석할까요?</div>
+    <div class="actions">
+      <button id="btn-settings" title="API 키 설정" style="background:#f2f4f6;color:#4e5968;margin-right:auto;">⚙</button>
+      <button id="btn-decline">아니요</button>
+      <button id="btn-accept">분석하기</button>
+    </div>
+    <div id="status"></div>
+  </div>
+
+  <svg id="character" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+    <!-- 몸통 -->
+    <rect class="body-torso" x="62" y="128" width="76" height="62" rx="20" />
+    <circle class="joint" cx="70" cy="140" r="6" />
+    <circle class="accent" cx="100" cy="160" r="7" />
+    <!-- 팔 -->
+    <rect class="body-torso" x="34" y="140" width="20" height="46" rx="10" />
+    <rect class="body-torso" x="146" y="140" width="20" height="46" rx="10" />
+    <circle class="joint" cx="44" cy="188" r="9" />
+    <circle class="joint" cx="156" cy="188" r="9" />
+    <!-- 다리 -->
+    <rect class="body-torso" x="72" y="186" width="18" height="26" rx="8" />
+    <rect class="body-torso" x="110" y="186" width="18" height="26" rx="8" />
+    <ellipse class="joint" cx="81" cy="214" rx="14" ry="7" />
+    <ellipse class="joint" cx="119" cy="214" rx="14" ry="7" />
+
+    <!-- 머리 -->
+    <circle class="head" cx="100" cy="70" r="62" />
+    <path class="visor" d="M45 55 a55 55 0 0 1 110 0 a55 65 0 0 1 -110 0 z" />
+    <circle class="eye-ring" cx="76" cy="58" r="16" />
+    <circle class="eye-ring small" cx="122" cy="58" r="12" />
+    <circle class="joint" cx="100" cy="18" r="5" />
+  </svg>
+</div>
+<script src="renderer.js"></script>
+</body>
+</html>

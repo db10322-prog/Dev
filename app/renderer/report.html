@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>판정 리포트</title>
+<link rel="stylesheet" href="report.css" />
+</head>
+<body>
+  <div id="root">
+    <div class="card">
+      <div class="verdict-row">
+        <span id="verdict-badge" class="verdict-badge">-</span>
+        <span id="confidence" class="confidence"></span>
+        <span id="cached-tag" class="cached-tag" style="display:none;">캐시된 결과</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>판단 근거</h3>
+      <ul id="reasons" class="reasons"></ul>
+    </div>
+
+    <div class="card">
+      <h3>교차 비교 기사</h3>
+      <div id="evidence" class="evidence-grid"></div>
+    </div>
+
+    <div class="card">
+      <h3>편향 방향 (매체 근거 + 텍스트 근거 분리 표시)</h3>
+      <div class="bias-spectrum"><div id="bias-marker" class="bias-marker"></div></div>
+      <ul id="bias-signals"></ul>
+      <h3 style="margin-top:12px;">반대 성향 기사</h3>
+      <div id="counter-articles" class="counter-articles"></div>
+    </div>
+
+    <div id="opinion-card" class="card" style="display:none;">
+      <h3>댓글 여론 요약</h3>
+      <div class="opinion-bar">
+        <div id="opinion-for" class="for"></div>
+        <div id="opinion-against" class="against"></div>
+      </div>
+      <div id="opinion-alignment" style="margin-bottom:6px;font-size:13px;"></div>
+      <ul id="opinion-points"></ul>
+    </div>
+
+    <div class="card limitations">
+      <h3>한계</h3>
+      <ul id="limitations"></ul>
+    </div>
+
+    <div class="footer-notice">
+      이 결과는 자동화된 AI 분석이며, 최종 판단은 사용자 본인의 몫입니다. 매체 성향은 외부 연구 인용, 텍스트 분석은 AI 추정입니다.
+    </div>
+  </div>
+  <script src="report.js"></script>
+</body>
+</html>

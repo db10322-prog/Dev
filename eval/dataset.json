@@ -1,0 +1,54 @@
+{
+  "_comment": "T-9 정확도 검증 세트. url/text는 placeholder — 실제 시연 전 각 30건을 실제 기사 URL+본문(확장으로 1회 수집)으로 교체하고 label을 직접 라벨링할 것. groundTruthVerdict는 core/schema.json의 verdict 4단계 중 하나, groundTruthDirection은 outlet-bias.json의 방향 6단계 중 하나.",
+  "groups": {
+    "already_debunked": {
+      "description": "팩트체크 기관이 이미 허위로 판정한 기사 10건",
+      "expectedVerdict": "사실과 다름",
+      "count": 10
+    },
+    "verified_normal": {
+      "description": "검증된 정상 보도 10건",
+      "expectedVerdict": "검증됨",
+      "count": 10
+    },
+    "clear_bias": {
+      "description": "성향이 뚜렷한 매체의 기사 10건 (편향 판정 검증용)",
+      "expectedVerdict": null,
+      "count": 10
+    }
+  },
+  "items": [
+    { "id": "debunked-01", "group": "already_debunked", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER — 실제 팩트체크 완료 허위 기사 본문으로 교체", "groundTruthVerdict": "사실과 다름", "groundTruthDirection": null },
+    { "id": "debunked-02", "group": "already_debunked", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "사실과 다름", "groundTruthDirection": null },
+    { "id": "debunked-03", "group": "already_debunked", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "사실과 다름", "groundTruthDirection": null },
+    { "id": "debunked-04", "group": "already_debunked", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "사실과 다름", "groundTruthDirection": null },
+    { "id": "debunked-05", "group": "already_debunked", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "사실과 다름", "groundTruthDirection": null },
+    { "id": "debunked-06", "group": "already_debunked", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "사실과 다름", "groundTruthDirection": null },
+    { "id": "debunked-07", "group": "already_debunked", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "사실과 다름", "groundTruthDirection": null },
+    { "id": "debunked-08", "group": "already_debunked", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "사실과 다름", "groundTruthDirection": null },
+    { "id": "debunked-09", "group": "already_debunked", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "사실과 다름", "groundTruthDirection": null },
+    { "id": "debunked-10", "group": "already_debunked", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "사실과 다름", "groundTruthDirection": null },
+
+    { "id": "normal-01", "group": "verified_normal", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER — 실제 검증된 정상 보도 본문으로 교체", "groundTruthVerdict": "검증됨", "groundTruthDirection": null },
+    { "id": "normal-02", "group": "verified_normal", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "검증됨", "groundTruthDirection": null },
+    { "id": "normal-03", "group": "verified_normal", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "검증됨", "groundTruthDirection": null },
+    { "id": "normal-04", "group": "verified_normal", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "검증됨", "groundTruthDirection": null },
+    { "id": "normal-05", "group": "verified_normal", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "검증됨", "groundTruthDirection": null },
+    { "id": "normal-06", "group": "verified_normal", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "검증됨", "groundTruthDirection": null },
+    { "id": "normal-07", "group": "verified_normal", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "검증됨", "groundTruthDirection": null },
+    { "id": "normal-08", "group": "verified_normal", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "검증됨", "groundTruthDirection": null },
+    { "id": "normal-09", "group": "verified_normal", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "검증됨", "groundTruthDirection": null },
+    { "id": "normal-10", "group": "verified_normal", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": "검증됨", "groundTruthDirection": null },
+
+    { "id": "bias-01", "group": "clear_bias", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER — 성향이 뚜렷한 매체의 실제 기사 본문으로 교체", "groundTruthVerdict": null, "groundTruthDirection": "PLACEHOLDER" },
+    { "id": "bias-02", "group": "clear_bias", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": null, "groundTruthDirection": "PLACEHOLDER" },
+    { "id": "bias-03", "group": "clear_bias", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": null, "groundTruthDirection": "PLACEHOLDER" },
+    { "id": "bias-04", "group": "clear_bias", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": null, "groundTruthDirection": "PLACEHOLDER" },
+    { "id": "bias-05", "group": "clear_bias", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": null, "groundTruthDirection": "PLACEHOLDER" },
+    { "id": "bias-06", "group": "clear_bias", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": null, "groundTruthDirection": "PLACEHOLDER" },
+    { "id": "bias-07", "group": "clear_bias", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": null, "groundTruthDirection": "PLACEHOLDER" },
+    { "id": "bias-08", "group": "clear_bias", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": null, "groundTruthDirection": "PLACEHOLDER" },
+    { "id": "bias-09", "group": "clear_bias", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": null, "groundTruthDirection": "PLACEHOLDER" },
+    { "id": "bias-10", "group": "clear_bias", "url": "PLACEHOLDER", "title": "PLACEHOLDER", "text": "PLACEHOLDER", "groundTruthVerdict": null, "groundTruthDirection": "PLACEHOLDER" }
+  ]
+}

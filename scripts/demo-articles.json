@@ -1,0 +1,32 @@
+[
+  {
+    "url": "https://news.naver.com/demo/article-1",
+    "title": "(데모용 placeholder) 정부, 내년도 최저임금 동결 발표",
+    "text": "이 텍스트는 데모 프리로드용 placeholder입니다. 실제 시연 전 실제 네이버 뉴스 기사 URL로 교체하고, extension으로 실제 본문을 1회 수집해 이 파일의 text 필드를 교체하세요. 최소 200자 이상이어야 파이프라인이 정상 동작합니다. 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복.",
+    "comments": ["찬성합니다", "글쎄요 반대", "물가 생각하면 이해됨", "소상공인 입장에선 다행"]
+  },
+  {
+    "url": "https://news.naver.com/demo/article-2",
+    "title": "(데모용 placeholder) 여야, 예산안 처리 놓고 충돌",
+    "text": "이 텍스트는 데모 프리로드용 placeholder입니다. 실제 시연 전 실제 기사로 교체하세요. 최소 200자 이상 필요. 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복.",
+    "comments": ["매번 이런식", "정치권 실망스럽다"]
+  },
+  {
+    "url": "https://news.naver.com/demo/article-3",
+    "title": "(데모용 placeholder) 신규 백신 부작용 논란",
+    "text": "이 텍스트는 데모 프리로드용 placeholder입니다. 실제 시연 전 실제 기사로 교체하세요. 최소 200자 이상 필요. 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복.",
+    "comments": []
+  },
+  {
+    "url": "https://news.naver.com/demo/article-4",
+    "title": "(데모용 placeholder) 부동산 대책 발표, 시장 반응 엇갈려",
+    "text": "이 텍스트는 데모 프리로드용 placeholder입니다. 실제 시연 전 실제 기사로 교체하세요. 최소 200자 이상 필요. 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복.",
+    "comments": ["집값 더 오를듯", "실효성 의문"]
+  },
+  {
+    "url": "https://news.naver.com/demo/article-5",
+    "title": "(데모용 placeholder) 교육부, 2027학년도 대입제도 개편안 공개",
+    "text": "이 텍스트는 데모 프리로드용 placeholder입니다. 실제 시연 전 실제 기사로 교체하세요. 최소 200자 이상 필요. 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복 반복.",
+    "comments": ["또 바뀌나요", "학생들만 힘들다"]
+  }
+]

@@ -1,0 +1,7 @@
+{
+  "name": "com.fakenewsagent.host",
+  "description": "뉴스 진위 판별 에이전트 — 크롬 확장과 Electron 앱을 잇는 네이티브 메시징 호스트",
+  "path": "host.bat",
+  "type": "stdio",
+  "allowed_origins": ["chrome-extension://__EXTENSION_ID__/"]
+}

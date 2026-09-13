@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VerdictReport",
+  "type": "object",
+  "required": ["verdict", "confidence", "reasons", "evidence", "bias", "counterArticles", "limitations"],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["검증됨", "대체로 사실", "근거 불충분", "사실과 다름"]
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "reasons": {
+      "type": "array",
+      "minItems": 3,
+      "items": { "type": "string" }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "outlet", "url", "stance", "supports"],
+        "properties": {
+          "title": { "type": "string" },
+          "outlet": { "type": "string" },
+          "url": { "type": "string" },
+          "stance": { "type": "string", "enum": ["지지", "반박", "중립"] },
+          "supports": { "type": "boolean" }
+        }
+      }
+    },
+    "bias": {
+      "type": "object",
+      "required": ["direction", "score", "signals"],
+      "properties": {
+        "direction": {
+          "type": "string",
+          "enum": ["진보", "중도진보", "중도", "중도보수", "보수", "미분류"]
+        },
+        "score": { "type": "number", "minimum": -1, "maximum": 1 },
+        "signals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["layer", "label", "detail"],
+            "properties": {
+              "layer": { "type": "string", "enum": ["매체", "텍스트"] },
+              "label": { "type": "string" },
+              "detail": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "counterArticles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "outlet", "url", "direction"],
+        "properties": {
+          "title": { "type": "string" },
+          "outlet": { "type": "string" },
+          "url": { "type": "string" },
+          "direction": { "type": "string" }
+        }
+      }
+    },
+    "opinion": {
+      "type": "object",
+      "properties": {
+        "forRatio": { "type": "number" },
+        "againstRatio": { "type": "number" },
+        "topPoints": { "type": "array", "items": { "type": "string" } },
+        "alignmentWithArticle": { "type": "string", "enum": ["일치", "괴리", "혼재"] }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "modelUsed": { "type": "string" },
+        "usedFallback": { "type": "boolean" },
+        "elapsedMs": { "type": "number" },
+        "cached": { "type": "boolean" }
+      }
+    }
+  }
+}

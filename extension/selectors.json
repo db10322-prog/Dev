@@ -1,0 +1,32 @@
+{
+  "_comment": "댓글 DOM 셀렉터를 코드 밖으로 외부화 — 네이버/다음 UI 개편 시 이 파일만 고치면 됨. 실패 시 comments는 빈 배열 반환, 전체 분석은 계속 진행.",
+  "sites": [
+    {
+      "name": "naver-news",
+      "hostPattern": "news.naver.com",
+      "articleBodySelectors": ["#dic_area", "#newsct_article", "article#dic_area"],
+      "titleSelectors": ["h2.media_end_head_headline", "#title_area span"],
+      "commentContainerSelectors": ["#cbox_module"],
+      "commentItemSelectors": [".u_cbox_contents"],
+      "commentIframeSelector": "#news_cbox_module iframe, iframe#cbox_module"
+    },
+    {
+      "name": "daum-news",
+      "hostPattern": "v.daum.net",
+      "articleBodySelectors": ["div.article_view", "#mArticle"],
+      "titleSelectors": ["h3.tit_view"],
+      "commentContainerSelectors": ["#alex-area"],
+      "commentItemSelectors": [".comment_info .desc_txt"],
+      "commentIframeSelector": null
+    },
+    {
+      "name": "outlet-generic",
+      "hostPattern": "*",
+      "articleBodySelectors": ["article", "#article-view-content-div", ".article_txt", ".news_body"],
+      "titleSelectors": ["h1", "h2.title"],
+      "commentContainerSelectors": [],
+      "commentItemSelectors": [],
+      "commentIframeSelector": null
+    }
+  ]
+}

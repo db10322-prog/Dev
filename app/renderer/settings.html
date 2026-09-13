@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>API 키 설정</title>
+<style>
+  body { font-family: -apple-system, "Malgun Gothic", sans-serif; padding: 20px; font-size: 14px; }
+  label { display: block; margin-top: 12px; font-weight: 600; }
+  input { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; }
+  button { margin-top: 18px; padding: 8px 16px; background: #5b8def; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+  #status { margin-top: 10px; color: #1e8e5a; font-size: 13px; }
+  p.hint { color: #888; font-size: 12px; }
+</style>
+</head>
+<body>
+  <h2>API 키 설정</h2>
+  <p class="hint">키는 로컬 .env 파일에만 저장되며, 코드에 박히거나 외부로 전송되지 않습니다. 저장 후 앱을 재시작해야 반영됩니다.</p>
+
+  <label>GEMINI_API_KEY</label>
+  <input id="gemini" type="password" />
+
+  <label>GROQ_API_KEY (폴백용)</label>
+  <input id="groq" type="password" />
+
+  <label>NAVER_CLIENT_ID</label>
+  <input id="naverId" type="text" />
+
+  <label>NAVER_CLIENT_SECRET</label>
+  <input id="naverSecret" type="password" />
+
+  <label>GOOGLE_FACTCHECK_API_KEY</label>
+  <input id="factcheck" type="password" />
+
+  <button id="save">저장</button>
+  <div id="status"></div>
+
+  <script src="settings.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+:root {
+  --verdict-verified: #1e8e5a;
+  --verdict-mostly: #4a90d9;
+  --verdict-insufficient: #b8860b;
+  --verdict-false: #c0392b;
+  --bg: #f7f8fa;
+  --card: #ffffff;
+  --text: #202124;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 20px; background: var(--bg); color: var(--text);
+  font-family: -apple-system, "Malgun Gothic", sans-serif; font-size: 14px;
+}
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px; margin-bottom: 14px;
+}
+.verdict-row { display: flex; align-items: center; gap: 12px; }
+.verdict-badge {
+  color: #fff; font-weight: 700; padding: 6px 14px; border-radius: 999px; font-size: 15px;
+}
+.verdict-badge.검증됨 { background: var(--verdict-verified); }
+.verdict-badge.대체로.사실 { background: var(--verdict-mostly); }
+.verdict-badge.근거.불충분 { background: var(--verdict-insufficient); }
+.verdict-badge.사실과.다름 { background: var(--verdict-false); }
+.confidence { color: var(--muted); font-size: 13px; }
+.cached-tag { font-size: 11px; color: #fff; background: #888; border-radius: 6px; padding: 2px 6px; }
+
+h3 { margin: 0 0 8px; font-size: 14px; color: var(--muted); }
+ul.reasons { margin: 0; padding-left: 18px; }
+ul.reasons li { margin-bottom: 4px; }
+
+.evidence-grid { display: flex; flex-direction: column; gap: 8px; }
+.evidence-item { border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+.evidence-item .stance { font-size: 11px; padding: 2px 6px; border-radius: 6px; margin-right: 6px; }
+.stance.지지 { background: #e6f4ea; color: #1e8e5a; }
+.stance.반박 { background: #fce8e6; color: #c0392b; }
+.stance.중립 { background: #eee; color: #666; }
+.evidence-item a { color: #1a56db; text-decoration: none; font-size: 13px; }
+.evidence-item .outlet { color: var(--muted); font-size: 12px; }
+
+.bias-spectrum {
+  position: relative; height: 10px; background: linear-gradient(to right, #1e56d9, #ccc, #d92b1e);
+  border-radius: 6px; margin: 10px 0 14px;
+}
+.bias-marker {
+  position: absolute; top: -6px; width: 4px; height: 22px; background: #222; border-radius: 2px;
+}
+.counter-articles { display: flex; gap: 10px; }
+.counter-articles .item { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+
+.opinion-bar { display: flex; height: 18px; border-radius: 6px; overflow: hidden; margin-bottom: 8px; }
+.opinion-bar .for { background: #1e8e5a; }
+.opinion-bar .against { background: #c0392b; }
+
+.limitations { background: #fffbea; border: 1px solid #f2e2a0; }
+.limitations li { margin-bottom: 4px; }
+
+.footer-notice {
+  font-size: 12px; color: var(--muted); border-top: 1px solid var(--border);
+  padding-top: 10px; margin-top: 4px;
+}

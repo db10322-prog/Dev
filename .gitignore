@@ -1,0 +1,10 @@
+node_modules/
+.env
+*.log
+spike/out/*.json
+!spike/out/.gitkeep
+dist/
+build/
+.vercel/
+cache/
+*.lnk

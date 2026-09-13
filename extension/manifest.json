@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "뉴스 진위·편향 판별 에이전트 (데모)",
+  "version": "0.1.0",
+  "description": "현재 탭의 뉴스 기사 본문/댓글을 읽어 데스크톱 캐릭터 앱으로 전달합니다.",
+  "permissions": ["nativeMessaging", "activeTab", "scripting"],
+  "host_permissions": [
+    "https://*.naver.com/*",
+    "https://*.daum.net/*",
+    "https://*.chosun.com/*",
+    "https://*.donga.com/*",
+    "https://*.hani.co.kr/*",
+    "https://*.khan.co.kr/*",
+    "https://*.joongang.co.kr/*",
+    "https://*.yna.co.kr/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.naver.com/*",
+        "https://*.daum.net/*",
+        "https://*.chosun.com/*",
+        "https://*.donga.com/*",
+        "https://*.hani.co.kr/*",
+        "https://*.khan.co.kr/*",
+        "https://*.joongang.co.kr/*",
+        "https://*.yna.co.kr/*"
+      ],
+      "js": ["vendor/Readability.js", "screening.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "뉴스 진위·편향 판별 에이전트"
+  }
+}

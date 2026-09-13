@@ -1,0 +1,29 @@
+{
+  "_comment": "T-7 사전 스크리닝 배지 규칙. API 호출 없이 content script 안에서 즉시 평가. 문구는 항상 단정형 금지, '~일 수 있어요' 톤 유지.",
+  "badges": {
+    "정보없음": {
+      "label": "정보 없음",
+      "message": "아직 교차검증 전입니다. 캐릭터를 클릭하면 상세 분석을 시작해요.",
+      "isDefault": true
+    },
+    "교차검증권장": {
+      "label": "교차검증 권장",
+      "message": "이 기사는 교차검증이 필요할 수 있어요.",
+      "conditions": ["매체 미분류", "제목 선정성 패턴", "출처 미표기"],
+      "minConditionsMatched": 2
+    },
+    "주의": {
+      "label": "주의",
+      "message": "관련 팩트체크 이력이 있어 확인이 필요할 수 있어요.",
+      "conditions": ["팩트체크 DB 즉시 히트"],
+      "minConditionsMatched": 1
+    }
+  },
+  "sensationalTitlePatterns": [
+    "충격", "경악", "결국", "발칵", "단독", "속보(?!\\s*=)", "\\?\\?\\?", "!!!", "소름", "멘붕"
+  ],
+  "sourceMissingPatterns": {
+    "quoteWithoutAttribution": "\"[^\"]{10,}\"(?!.{0,20}(라고|말했다|밝혔다|전했다))"
+  },
+  "factcheckHitCacheTtlMs": 86400000
+}
