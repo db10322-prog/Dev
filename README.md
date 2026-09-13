@@ -26,21 +26,36 @@
 npm install
 ```
 
-### 2. API 키 발급 + 실측 (T-0, 반드시 먼저)
+### 2. 본체 AI 준비 — 로컬 모델 (계정/키 불필요, 기본 경로)
 
-`.env.example`을 `.env`로 복사하고 아래 키를 채운다:
-- `GEMINI_API_KEY` — [Google AI Studio](https://aistudio.google.com/)
-- `NAVER_CLIENT_ID` / `NAVER_CLIENT_SECRET` — [네이버 개발자센터](https://developers.naver.com/)
-- `GOOGLE_FACTCHECK_API_KEY` — Google Cloud Console에서 Fact Check Tools API 활성화
-- `GROQ_API_KEY` — [Groq Console](https://console.groq.com/) (폴백용)
+**Gemini API와 Groq API는 둘 다 이용약관상 만 18세 이상만 사용 가능**해서 ([Gemini API 약관](https://ai.google.dev/gemini-api/terms), [Groq Services Agreement](https://console.groq.com/docs/legal/services-agreement)), 미성년 개발자는 본인 명의로 키를 발급받을 수 없다. 이 프로젝트의 기본값은 그래서 **로컬 실행 모델**(Qwen2.5-3B-Instruct, Apache-2.0 라이선스 — 나이 제한 없음)이다. 계정 생성도, 로그인도, 이용약관 동의도 필요 없다.
+
+```bash
+npm run download-model
+```
+
+약 2GB, 익명 다운로드(로그인 불필요). 완료 후 확인:
+
+```bash
+npm run spike:local-llm
+```
+
+첫 실행은 모델 로딩 때문에 느릴 수 있다. CPU만으로 동작(일부 내장 그래픽은 GPU 가속과 호환 안 돼 `core/agents/localLlm.js`가 `gpu: false`로 고정해둠). 노트북 성능에 따라 20초 목표 예산 안에 들어오는지 이 스파이크로 직접 재볼 것 — 느리면 `scripts/download-model.js`의 모델을 더 작은 것(예: Qwen2.5-1.5B)으로 바꿀 수 있다.
+
+**성인(부모님/선생님 등)이 대신 만들어준 Gemini/Groq 키가 있다면** `.env`에 채워 넣으면 `core/agents/llm.js`가 로컬 모델 대신 더 빠른 그쪽을 우선 사용한다 — 선택 사항이지 필수 아님.
+
+### 2-1. 서브 에이전트 키 (네이버는 직접 가능, 팩트체크는 선택)
+
+`.env.example`을 `.env`로 복사하고:
+- `NAVER_CLIENT_ID` / `NAVER_CLIENT_SECRET` — [네이버 개발자센터](https://developers.naver.com/) (연령 제한 문구 없음, 직접 가입 가능)
+- `GOOGLE_FACTCHECK_API_KEY` — **선택 사항.** 비워두면 `core/agents/factCheck.js`가 네이버 뉴스 보조 쿼리로 자동 폴백한다. Google Cloud Console 프로젝트 생성이 번거로우면 그냥 생략.
 
 ```bash
 npm run spike:naver
-npm run spike:gemini
-npm run spike:factcheck
+npm run spike:factcheck   # GOOGLE_FACTCHECK_API_KEY 없으면 자동으로 스킵됨
 ```
 
-`spike/out/`에 저장된 결과를 확인하고, 특히 팩트체크 ko 검색 결과 건수를 기록한다(0에 가까우면 `core/agents/factCheck.js`의 네이버 보조쿼리 폴백이 이미 구현돼 있으니 그대로 진행 가능).
+`spike/out/`에 저장된 결과를 확인.
 
 ### 3. 파이프라인 단독 테스트 (T-1)
 

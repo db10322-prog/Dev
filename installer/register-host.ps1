@@ -19,10 +19,19 @@ if (-not (Test-Path $HostBat)) {
 }
 
 # manifest.json 의 __EXTENSION_ID__ 플레이스홀더와 상대경로를 실제 값으로 치환.
-$manifestContent = Get-Content $ManifestSrc -Raw
+# -Encoding UTF8 필수: Windows PowerShell 5.1의 Get-Content 기본 인코딩은 BOM 없는 UTF-8
+# 파일을 시스템 코드페이지(한국어 Windows에서는 CP949)로 잘못 읽어 한글이 깨진다.
+$manifestContent = Get-Content $ManifestSrc -Raw -Encoding UTF8
 $manifestContent = $manifestContent -replace "__EXTENSION_ID__", $ExtensionId
-$manifestContent = $manifestContent -replace '"path": "host\.bat"', ('"path": "' + ($HostBat -replace '\\', '\\\\') + '"')
-Set-Content -Path $ManifestOut -Value $manifestContent -Encoding utf8NoBOM
+# JSON 이스케이프는 원본 백슬래시 1개당 2개(\\)여야 한다. PowerShell 단일따옴표 문자열은
+# 이스케이프를 안 하므로 replacement에 '\\'(문자 2개)를 그대로 쓰면 된다 — '\\\\'(4개)를 쓰면
+# JSON 파싱 후 경로에 백슬래시가 2배로 남는 버그가 생김(실제로 겪었음).
+$escapedPath = $HostBat -replace '\\', '\\'
+$manifestContent = $manifestContent -replace '"path": "host\.bat"', ('"path": "' + $escapedPath + '"')
+# Windows PowerShell 5.1엔 utf8NoBOM 인코딩이 없음(PowerShell 7+ 전용) — BOM 없는 UTF-8을
+# 직접 써야 크롬 네이티브 메시징 호스트가 이 JSON을 깨지지 않고 읽는다.
+$Utf8NoBom = New-Object System.Text.UTF8Encoding $false
+[System.IO.File]::WriteAllText($ManifestOut, $manifestContent, $Utf8NoBom)
 
 $RegKeyPath = "HKCU:\SOFTWARE\Google\Chrome\NativeMessagingHosts\com.fakenewsagent.host"
 New-Item -Path $RegKeyPath -Force | Out-Null

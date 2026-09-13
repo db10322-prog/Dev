@@ -8,3 +8,5 @@ build/
 .vercel/
 cache/
 *.lnk
+models/*.gguf
+native-host/manifest.generated.json

@@ -12,7 +12,9 @@
     "spike:factcheck": "node spike/factcheck_ko.js",
     "preload:demo": "node scripts/preload-demo.js",
     "eval": "node eval/run.js",
-    "register-host": "powershell -ExecutionPolicy Bypass -File installer/register-host.ps1"
+    "register-host": "powershell -ExecutionPolicy Bypass -File installer/register-host.ps1",
+    "download-model": "node scripts/download-model.js",
+    "spike:local-llm": "node spike/local_llm_json.js"
   },
   "dependencies": {
     "@mozilla/readability": "^0.5.0",
@@ -21,6 +23,7 @@
     "express": "^4.19.2",
     "jsdom": "^24.1.3",
     "node-fetch": "^2.7.0",
+    "node-llama-cpp": "^3.20.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {
@@ -30,6 +33,7 @@
   "author": "",
   "license": "UNLICENSED",
   "allowScripts": {
-    "electron@31.7.7": true
+    "electron@31.7.7": true,
+    "node-llama-cpp@3.20.0": true
   }
 }
