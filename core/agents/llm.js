@@ -16,7 +16,19 @@
 //
 // core/pipeline.js 및 core/agents/comments.js 에서 공용으로 사용.
 const fetch = require("node-fetch");
-const { callLocalLlmJson } = require("./localLlm");
+
+// 로컬 모델은 Electron 데스크톱 환경 전용 — Vercel 서버리스(Linux, 모델 파일도 없음)에서는
+// 절대 로드하면 안 된다(실제로 빌드가 깨지는 걸 겪었음). require를 지연시켜서 이 모듈이
+// Vercel 번들에 아예 딸려 들어가지 않게 하고, callLocalLlmJson()도 VERCEL 환경변수가 있으면
+// 호출 자체를 막는다.
+function callLocalLlmJson(args) {
+  if (process.env.VERCEL) {
+    return Promise.reject(
+      new Error("로컬 모델은 Vercel 환경에서 비활성화됨 — MISTRAL_API_KEY/GEMINI_API_KEY/GROQ_API_KEY 중 하나를 환경변수에 설정하세요.")
+    );
+  }
+  return require("./localLlm").callLocalLlmJson(args);
+}
 
 async function callMistral({ prompt, responseSchema, apiKey, model }) {
   const key = apiKey || process.env.MISTRAL_API_KEY;
