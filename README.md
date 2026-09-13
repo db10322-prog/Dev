@@ -100,6 +100,17 @@ npm run dev
 
 `http://localhost:3000` 접속. 배포는 `docs/deployment-vercel-supabase.md` 참고 (Vercel + Supabase).
 
+## 문제 해결
+
+**`npm start` 실행 시 `ipcMain`/`app` 관련 TypeError가 나거나, `Cannot find module 'electron'` 오류가 뜨는 경우**: 셸 환경변수 `ELECTRON_RUN_AS_NODE`가 `1`로 설정돼 있으면 Electron 바이너리가 GUI 앱이 아니라 일반 Node.js처럼 동작해 `require("electron")`이 정상 API 대신 깨진 값을 반환합니다. 확인/해제:
+
+```powershell
+echo $env:ELECTRON_RUN_AS_NODE   # 1이 출력되면 원인
+Remove-Item Env:\ELECTRON_RUN_AS_NODE   # 현재 세션에서만 해제
+```
+
+이 변수는 보통 다른 Electron 기반 도구(예: 일부 개발 도구)가 자식 프로세스용으로 설정해두는 경우가 많습니다. 새 터미널 창을 열어 실행하거나, 위 명령으로 해제 후 `npm start`를 실행하세요.
+
 ## 완료 기준 재확인
 
 노트북 부팅 → 바로가기 클릭 → 캐릭터 등장 → 뉴스 기사 열고 클릭 → 수락 → 20초 이내 판정등급+근거3줄, 근거기사3건, 편향+반대기사2건, 댓글요약 표시. 서로 다른 기사 5건 연속 재현. 이 저장소의 코드는 이 흐름을 그대로 구현하지만, **실제 API 키 발급/네이버 앱 등록/확장 ID 등록은 사용자가 직접 수행해야 하는 단계**다 (자동화 불가능한 외부 계정 절차).
