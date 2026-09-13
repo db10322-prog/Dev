@@ -3,7 +3,7 @@ require("dotenv").config();
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
-const { app, BrowserWindow, ipcMain, screen } = require("electron");
+const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage } = require("electron");
 const WebSocket = require("ws");
 const { analyzeArticle } = require("../core/pipeline");
 
@@ -14,6 +14,8 @@ const SETTINGS_KEYS = ["GEMINI_API_KEY", "GROQ_API_KEY", "NAVER_CLIENT_ID", "NAV
 let characterWindow = null;
 let reportWindow = null;
 let settingsWindow = null;
+let tray = null;
+let isQuitting = false;
 let wss = null;
 let hostSocket = null; // native-host/host.js 가 붙는 연결
 const pendingRequests = new Map(); // requestId -> {resolve, reject}
@@ -43,6 +45,45 @@ function createCharacterWindow() {
 
   // 캐릭터 영역 밖 클릭은 데스크톱으로 통과시킴 (렌더러가 마우스 위치를 보고 토글 요청).
   characterWindow.setIgnoreMouseEvents(false);
+
+  // 창의 X(닫기)는 트레이로 숨기기만 함 — 프로세스는 트레이 아이콘 클릭으로 계속 켜져 있어야 함.
+  // 진짜 종료는 트레이 메뉴의 "종료"(isQuitting=true 후 app.quit())로만 가능.
+  characterWindow.on("close", (event) => {
+    if (!isQuitting) {
+      event.preventDefault();
+      characterWindow.hide();
+    }
+  });
+}
+
+function showCharacterWindow() {
+  if (!characterWindow || characterWindow.isDestroyed()) {
+    createCharacterWindow();
+  } else {
+    characterWindow.show();
+    characterWindow.focus();
+  }
+}
+
+function createTray() {
+  const icon = nativeImage.createFromPath(path.join(__dirname, "character", "tray-icon.png"));
+  tray = new Tray(icon);
+  tray.setToolTip("뉴스 진위·편향 판별 에이전트");
+
+  const contextMenu = Menu.buildFromTemplate([
+    { label: "캐릭터 열기", click: () => showCharacterWindow() },
+    { label: "API 키 설정", click: () => createSettingsWindow() },
+    { type: "separator" },
+    {
+      label: "종료",
+      click: () => {
+        isQuitting = true;
+        app.quit();
+      },
+    },
+  ]);
+  tray.setContextMenu(contextMenu);
+  tray.on("click", () => showCharacterWindow());
 }
 
 function createReportWindow() {
@@ -56,6 +97,14 @@ function createReportWindow() {
     },
   });
   reportWindow.loadFile(path.join(__dirname, "renderer", "report.html"));
+
+  // 결과 창도 닫기(X)는 숨기기만 — 다음 분석 때 재사용(웹뷰 재생성 비용 회피).
+  reportWindow.on("close", (event) => {
+    if (!isQuitting) {
+      event.preventDefault();
+      reportWindow.hide();
+    }
+  });
 }
 
 function startNativeBridgeServer() {
@@ -179,8 +228,14 @@ app.whenReady().then(() => {
   startNativeBridgeServer();
   createCharacterWindow();
   createReportWindow();
+  createTray();
 });
 
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
+// 트레이 상주 앱이므로 모든 창이 닫혀도 프로세스는 유지 — 종료는 트레이 메뉴에서만.
+app.on("window-all-closed", (event) => {
+  event.preventDefault();
+});
+
+app.on("before-quit", () => {
+  isQuitting = true;
 });
