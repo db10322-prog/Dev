@@ -21,8 +21,9 @@ const RESPONSE_SCHEMA = {
 
 function buildPrompt(sentence) {
   return (
+    "모든 답변은 반드시 한국어로만 작성해. 다른 언어를 섞지 마.\n" +
     "다음 한국어 뉴스 문장의 사실 여부를 4단계(검증됨/대체로 사실/근거 불충분/사실과 다름)로 " +
-    `판정하고 근거를 3줄 이상 제시해. confidence는 0과 1 사이 소수로. 문장: "${sentence}"`
+    `판정하고 근거를 3줄 이상 한국어로 제시해. confidence는 0과 1 사이 소수로. 문장: "${sentence}"`
   );
 }
 

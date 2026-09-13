@@ -38,17 +38,32 @@ async function callLocalLlmJson({ prompt, responseSchema }) {
   const { llama, context } = await getSession();
   const { LlamaChatSession, LlamaJsonSchemaGrammar } = await import("node-llama-cpp");
 
-  const session = new LlamaChatSession({ contextSequence: context.getSequence() });
-  const grammar = responseSchema ? new LlamaJsonSchemaGrammar(llama, responseSchema) : undefined;
+  // context는 시퀀스를 한정된 개수만 갖고 있고(기본 1개), getSequence()로 받은 시퀀스를
+  // 세션과 함께 dispose() 해주지 않으면 다음 호출에서 "No sequences left" 오류가 난다 —
+  // 실제로 두 번째 호출에서 이 버그로 죽는 걸 확인함. 매 호출마다 반드시 해제해야 함.
+  const sequence = context.getSequence();
+  const session = new LlamaChatSession({ contextSequence: sequence });
+  try {
+    const grammar = responseSchema ? new LlamaJsonSchemaGrammar(llama, responseSchema) : undefined;
 
-  const responseText = await session.prompt(prompt, {
-    grammar,
-    maxTokens: 1024,
-    temperature: 0.2,
-  });
+    const responseText = await session.prompt(prompt, {
+      grammar,
+      maxTokens: 1024,
+      // temperature가 너무 낮으면(0.2) 이 작은 모델은 반복적으로 같은 패턴(예: 존재하지도
+      // 않는 "url: https://..." 문자열)을 그대로 복제해 찍어내는 퇴화 현상이 실제로 관찰됨.
+      // repeatPenalty를 걸고 temperature를 조금 올려 반복 패턴을 억제.
+      temperature: 0.5,
+      repeatPenalty: { penalty: 1.15 },
+    });
 
-  const json = grammar ? grammar.parse(responseText) : JSON.parse(responseText);
-  return { json, modelUsed: "local:qwen2.5-1.5b-instruct-q8_0" };
+    const json = grammar ? grammar.parse(responseText) : JSON.parse(responseText);
+    return { json, modelUsed: "local:qwen2.5-1.5b-instruct-q8_0" };
+  } finally {
+    // session.dispose() 기본값은 disposeSequence:false — contextSequence를 우리가 직접
+    // 넘겼기 때문에 세션이 "남의 시퀀스"로 간주해 안 풀어준다. 명시적으로 true를 줘야
+    // 실제로 시퀀스가 풀려서 다음 호출이 "No sequences left"로 죽지 않는다(실제로 겪은 버그).
+    session.dispose({ disposeSequence: true });
+  }
 }
 
 module.exports = { callLocalLlmJson, MODEL_PATH };
