@@ -14,7 +14,8 @@
     "eval": "node eval/run.js",
     "register-host": "powershell -ExecutionPolicy Bypass -File installer/register-host.ps1",
     "download-model": "node scripts/download-model.js",
-    "spike:local-llm": "node spike/local_llm_json.js"
+    "spike:local-llm": "node spike/local_llm_json.js",
+    "spike:mistral": "node spike/mistral_json.js"
   },
   "dependencies": {
     "@mozilla/readability": "^0.5.0",

@@ -9,7 +9,7 @@ const { analyzeArticle } = require("../core/pipeline");
 
 const WS_PORT = process.env.NATIVE_HOST_HTTP_PORT || 5757;
 const ENV_PATH = path.join(__dirname, "..", ".env");
-const SETTINGS_KEYS = ["GEMINI_API_KEY", "GROQ_API_KEY", "NAVER_CLIENT_ID", "NAVER_CLIENT_SECRET", "GOOGLE_FACTCHECK_API_KEY"];
+const SETTINGS_KEYS = ["MISTRAL_API_KEY", "GEMINI_API_KEY", "GROQ_API_KEY", "NAVER_CLIENT_ID", "NAVER_CLIENT_SECRET", "GOOGLE_FACTCHECK_API_KEY"];
 
 let characterWindow = null;
 let reportWindow = null;
@@ -22,8 +22,11 @@ const pendingRequests = new Map(); // requestId -> {resolve, reject}
 
 function createCharacterWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const winWidth = 220;
-  const winHeight = 260;
+  // index.html의 #stage(240x340)와 반드시 맞춰야 함 — Electron은 창 크기 밖으로 나온
+  // 내용을 그냥 잘라버리므로(웹페이지처럼 스크롤이 생기지 않음), 말풍선이 위로 자라날
+  // 공간을 충분히 확보해야 말풍선이 잘리지 않는다.
+  const winWidth = 240;
+  const winHeight = 340;
 
   characterWindow = new BrowserWindow({
     width: winWidth,

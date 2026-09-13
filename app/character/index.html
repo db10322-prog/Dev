@@ -8,7 +8,9 @@
     margin: 0; padding: 0; background: transparent; overflow: hidden;
     font-family: -apple-system, "Malgun Gothic", sans-serif; user-select: none;
   }
-  #stage { position: relative; width: 220px; height: 280px; }
+  /* app/main.js의 BrowserWindow 크기(240x340)와 반드시 일치해야 함 —
+     Electron은 창 밖으로 나간 내용을 스크롤 없이 그냥 잘라버림. */
+  #stage { position: relative; width: 240px; height: 340px; }
 
   /* 참고 이미지(둥근 흰색/검정 로봇 헤드 + 파란 링 눈)를 SVG로 재현한 캐릭터 */
   #character {

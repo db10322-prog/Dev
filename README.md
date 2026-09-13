@@ -26,15 +26,23 @@
 npm install
 ```
 
-### 2. 본체 AI 준비 — 로컬 모델 (계정/키 불필요, 기본 경로)
+### 2. 본체 AI 준비 — 품질 우선순위: Mistral(추천) > 로컬 모델(기본값)
 
-**Gemini API와 Groq API는 둘 다 이용약관상 만 18세 이상만 사용 가능**해서 ([Gemini API 약관](https://ai.google.dev/gemini-api/terms), [Groq Services Agreement](https://console.groq.com/docs/legal/services-agreement)), 미성년 개발자는 본인 명의로 키를 발급받을 수 없다. 이 프로젝트의 기본값은 그래서 **로컬 실행 모델**(Qwen2.5-3B-Instruct, Apache-2.0 라이선스 — 나이 제한 없음)이다. 계정 생성도, 로그인도, 이용약관 동의도 필요 없다.
+**Gemini API와 Groq API는 둘 다 이용약관상 만 18세 이상만 사용 가능**해서 ([Gemini API 약관](https://ai.google.dev/gemini-api/terms), [Groq Services Agreement](https://console.groq.com/docs/legal/services-agreement)), 미성년 개발자는 본인 명의로 키를 발급받을 수 없다.
+
+**그 대신 추천: [Mistral AI](https://console.mistral.ai/)** — 이용약관상 만 13세 이상이고, 미성년자는 보호자 동의만 있으면 본인 명의로 직접 가입 가능하다(카드 불필요, SMS 인증만). 무료 "Experiment" 티어가 Mistral Large(로컬 1.5B 모델보다 품질이 훨씬 좋음)를 월 10억 토큰까지 무료로 열어준다. 가입 후 API 키를 `.env`의 `MISTRAL_API_KEY`에 넣으면 자동으로 이게 최우선으로 쓰인다.
+
+```bash
+npm run spike:mistral
+```
+
+키를 아예 안 넣어도(또는 Mistral 없이 데모하고 싶어도) **로컬 실행 모델**(Qwen2.5-1.5B-Instruct, Apache-2.0 라이선스 — 나이 제한 없음)이 기본값으로 동작한다. 계정 생성도, 로그인도, 이용약관 동의도 필요 없다.
 
 ```bash
 npm run download-model
 ```
 
-약 2GB, 익명 다운로드(로그인 불필요). 완료 후 확인:
+약 2GB, 익명 다운로드(로그인 불필요, HF가 느리면 ModelScope로 자동 전환). 완료 후 확인:
 
 ```bash
 npm run spike:local-llm
