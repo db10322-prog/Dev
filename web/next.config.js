@@ -12,10 +12,18 @@ module.exports = {
   // 애초에 맞지 않는 패키지라 웹팩이 번들링을 시도하면 빌드 자체가 실패한다(실제로 겪음).
   // external로 빼서 웹팩이 파싱/번들링을 아예 시도하지 않게 한다 — 런타임에도 이 경로는
   // core/agents/llm.js가 VERCEL 환경변수를 보고 아예 호출하지 않도록 막아둠.
+  //
+  // jsdom도 같은 이유로 external 처리한다 — 이쪽은 빌드가 아니라 "런타임에 조용히 깨지는"
+  // 훨씬 골치아픈 쪽이었다: jsdom은 내부적으로 여러 기능(Image, canvas 등)을 동적 require로
+  // 지연 로드하는데, 웹팩이 이걸 정적으로 분석·재작성하면서 `new window.Image()`가
+  // "Image is not a constructor"로 깨지는 걸 실제로 재현함(core/agents/articleFetch.js가
+  // Readability로 기사 본문을 추출할 때 매번 실패 → /api/analyze, /api/analyze-url 양쪽 다
+  // "본문 추출 실패"로 오분류됨 — 실제로는 추출이 아니라 번들링 문제였음). external로 빼서
+  // 웹팩이 건드리지 않게 하면 플레인 Node에서와 동일하게 정상 동작한다(직접 재현·검증함).
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals = config.externals || [];
-      config.externals.push("node-llama-cpp");
+      config.externals.push("node-llama-cpp", "jsdom");
     }
     // Vercel은 Root Directory(web/)의 package.json만 보고 web/node_modules 에만 설치한다 —
     // 리포 루트에는 아무것도 설치하지 않는다. core/agents/*.js 는 web/ 바깥(형제 디렉터리)에

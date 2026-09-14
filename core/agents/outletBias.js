@@ -1,8 +1,13 @@
 // 매체 성향 매핑 조회 (T-2). data/outlet-bias.json 을 읽어 도메인 → 성향 라벨 반환.
 const fs = require("fs");
 const path = require("path");
+const { resolveCoreAsset } = require("../resolveAsset");
 
-const TABLE_PATH = path.join(__dirname, "..", "..", "data", "outlet-bias.json");
+const TABLE_PATH = resolveCoreAsset(
+  path.join(__dirname, "..", "..", "data", "outlet-bias.json"),
+  "data",
+  "outlet-bias.json"
+);
 let cachedTable = null;
 
 function loadTable() {

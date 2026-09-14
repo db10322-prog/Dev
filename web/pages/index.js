@@ -1,3 +1,4 @@
+import Link from "next/link";
 import CharacterIllustration from "../components/CharacterIllustration";
 import ReportPreviewMockup from "../components/ReportPreviewMockup";
 import CopyLinkButton from "../components/CopyLinkButton";
@@ -71,8 +72,12 @@ export default function Home() {
             <div className="pc-only-notice">
               <span className="glyph">💻</span>
               <div>
-                <strong>PC 전용 프로그램입니다</strong>
-                <p>휴대폰으로는 설치·실행할 수 없어요. 아래에서 작동 화면 미리보기를 확인하시고, PC에서 여시려면 링크를 저장해두세요.</p>
+                <strong>캐릭터 앱은 PC 전용입니다</strong>
+                <p>바탕화면 캐릭터 + 크롬 확장 조합은 휴대폰에 설치·실행할 수 없어요(OS 정책상 불가능). 대신 아래 버튼으로 지금 바로 휴대폰에서 기사 링크를 분석해볼 수 있습니다.</p>
+                <Link href="/analyze" className="copy-link-btn" style={{ display: "inline-flex" }}>
+                  휴대폰에서 링크로 바로 분석해보기 →
+                </Link>
+                <br />
                 <CopyLinkButton />
               </div>
             </div>

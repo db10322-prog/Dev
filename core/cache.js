@@ -3,7 +3,20 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-const LOCAL_CACHE_DIR = path.join(__dirname, "..", "cache");
+// __dirname 기준 경로는 Electron/CLI(순수 Node)에서만 맞다 — web/의 Next.js API route를 거쳐
+// webpack으로 번들링되면 __dirname이 번들 출력 위치를 가리켜 엉뚱한 곳에 쓰려 하므로(pipeline.js의
+// 프롬프트 로딩과 동일한 버그), 상위 폴더가 실제로 존재하는 후보를 찾아 그쪽을 쓴다. 어차피
+// Vercel 배포는 CACHE_BACKEND=supabase를 쓰도록 문서화돼 있고, 여기서 실패해도 pipeline.js가
+// 캐시 조회/저장 실패를 무시하고 계속 진행하므로 최악의 경우 "캐싱만 안 됨" 정도로 그친다.
+function resolveLocalCacheDir() {
+  const candidates = [
+    path.join(__dirname, "..", "cache"),
+    path.join(process.cwd(), "cache"),
+    path.join(process.cwd(), "..", "cache"),
+  ];
+  return candidates.find((c) => fs.existsSync(path.dirname(c))) || candidates[0];
+}
+const LOCAL_CACHE_DIR = resolveLocalCacheDir();
 
 function keyFor(url) {
   return crypto.createHash("sha256").update(url).digest("hex");

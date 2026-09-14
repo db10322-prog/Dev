@@ -4,6 +4,7 @@ require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 
+const { resolveCoreAsset } = require("./resolveAsset");
 const { buildSearchQuery } = require("./keywordExtract");
 const { searchNaverNews } = require("./agents/naverNews");
 const { searchFactChecksWithFallback } = require("./agents/factCheck");
@@ -14,8 +15,13 @@ const { summarizeOpinion } = require("./agents/comments");
 const { callLLMJson } = require("./agents/llm");
 const { getCached, setCached } = require("./cache");
 
-const VERDICT_PROMPT_TEMPLATE = fs.readFileSync(path.join(__dirname, "prompts", "verdict.md"), "utf-8");
-const VERDICT_SCHEMA = JSON.parse(fs.readFileSync(path.join(__dirname, "schema.json"), "utf-8"));
+const VERDICT_PROMPT_TEMPLATE = fs.readFileSync(
+  resolveCoreAsset(path.join(__dirname, "prompts", "verdict.md"), "core", "prompts", "verdict.md"),
+  "utf-8"
+);
+const VERDICT_SCHEMA = JSON.parse(
+  fs.readFileSync(resolveCoreAsset(path.join(__dirname, "schema.json"), "core", "schema.json"), "utf-8")
+);
 
 /**
  * @param {{url: string, title?: string, text: string, comments?: string[]}} input
@@ -28,9 +34,15 @@ async function analyzeArticle(input, opts = {}) {
   const startedAt = Date.now();
 
   if (useCache) {
-    const cached = await getCached(url);
-    if (cached) {
-      return { ...cached.report, meta: { ...cached.report.meta, cached: true } };
+    try {
+      const cached = await getCached(url);
+      if (cached) {
+        return { ...cached.report, meta: { ...cached.report.meta, cached: true } };
+      }
+    } catch (e) {
+      // 캐시는 있으면 좋고 없어도 그만인 최적화일 뿐 — 백엔드 설정(예: Vercel에 CACHE_BACKEND=supabase
+      // 없이 배포)이 안 맞아 조회가 실패해도 분석 자체는 계속 진행돼야 한다.
+      console.warn("[pipeline] 캐시 조회 실패(무시하고 계속 진행):", e.message);
     }
   }
 
@@ -103,7 +115,15 @@ async function analyzeArticle(input, opts = {}) {
     cached: false,
   };
 
-  if (useCache) await setCached(url, report);
+  if (useCache) {
+    try {
+      await setCached(url, report);
+    } catch (e) {
+      // 위와 동일한 이유로 저장 실패는 무시 — 로컬 파일 캐시는 Vercel의 읽기 전용 파일시스템에서
+      // 쓰기 자체가 막혀 있어(EROFS), CACHE_BACKEND=supabase 설정 전까지는 이 경로를 계속 탄다.
+      console.warn("[pipeline] 캐시 저장 실패(무시):", e.message);
+    }
+  }
   return report;
 }
 

@@ -2,8 +2,12 @@
 const fs = require("fs");
 const path = require("path");
 const { callLLMJson } = require("./llm");
+const { resolveCoreAsset } = require("../resolveAsset");
 
-const PROMPT_TEMPLATE = fs.readFileSync(path.join(__dirname, "..", "prompts", "bias.md"), "utf-8");
+const PROMPT_TEMPLATE = fs.readFileSync(
+  resolveCoreAsset(path.join(__dirname, "..", "prompts", "bias.md"), "core", "prompts", "bias.md"),
+  "utf-8"
+);
 
 const TEXT_BIAS_SCHEMA = {
   type: "array",

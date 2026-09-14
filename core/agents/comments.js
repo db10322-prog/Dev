@@ -2,8 +2,12 @@
 const fs = require("fs");
 const path = require("path");
 const { callLLMJson } = require("./llm");
+const { resolveCoreAsset } = require("../resolveAsset");
 
-const PROMPT_TEMPLATE = fs.readFileSync(path.join(__dirname, "..", "prompts", "opinion.md"), "utf-8");
+const PROMPT_TEMPLATE = fs.readFileSync(
+  resolveCoreAsset(path.join(__dirname, "..", "prompts", "opinion.md"), "core", "prompts", "opinion.md"),
+  "utf-8"
+);
 
 const OPINION_SCHEMA = {
   type: "object",

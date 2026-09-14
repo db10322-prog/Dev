@@ -11,7 +11,7 @@
 | `native-host/` | 크롬 네이티브 메시징 호스트 (확장 ↔ Electron 브릿지) |
 | `app/` | Electron 데스크톱 캐릭터 + 결과 리포트 UI + 설정 화면 |
 | `installer/` | 네이티브 호스트 레지스트리 등록 + 바탕화면 바로가기 생성 스크립트 |
-| `web/` | 소개/다운로드 랜딩 페이지 + Vercel 서버리스 분석 API (Next.js) |
+| `web/` | 소개/다운로드 랜딩 페이지 + Vercel 서버리스 분석 API + 모바일용 URL 분석 페이지(`/analyze`) (Next.js) |
 | `data/` | 매체 성향 테이블, 사전 스크리닝 규칙, 댓글 셀렉터 |
 | `spike/` | T-0 API 실호출 스파이크 스크립트 |
 | `eval/` | T-9 정확도 검증 세트 |
@@ -123,7 +123,7 @@ npm install
 npm run dev
 ```
 
-`http://localhost:3000` 접속. 배포는 `docs/deployment-vercel-supabase.md` 참고 (Vercel + Supabase).
+`http://localhost:3000` 접속. `/analyze`는 크롬 확장·Electron 앱 없이 휴대폰 브라우저에서 기사 URL만 붙여넣어 분석하는 페이지 — 단, `.env`에 `MISTRAL_API_KEY`(또는 `GEMINI_API_KEY`/`GROQ_API_KEY`) 중 하나가 있어야 실제 판정까지 나온다(없으면 로컬 모델로 폴백을 시도하는데, Vercel 배포본에서는 이 폴백 자체가 막혀 있음). 배포는 `docs/deployment-vercel-supabase.md` 참고 (Vercel + Supabase).
 
 ## 문제 해결
 
