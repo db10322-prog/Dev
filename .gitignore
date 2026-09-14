@@ -9,4 +9,5 @@ build/
 cache/
 *.lnk
 models/*.gguf
+release/
 native-host/manifest.generated.json

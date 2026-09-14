@@ -6,4 +6,5 @@ contextBridge.exposeInMainWorld("agentAPI", {
   openSettings: () => ipcRenderer.invoke("open-settings"),
   getSettings: () => ipcRenderer.invoke("get-settings"),
   saveSettings: (values) => ipcRenderer.invoke("save-settings", values),
+  onSetupProgress: (callback) => ipcRenderer.on("setup-progress", (_event, data) => callback(data)),
 });

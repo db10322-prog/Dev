@@ -6,10 +6,8 @@
 // node-llama-cpp는 MIT 라이선스 오픈소스 라이브러리(계정/약관 동의 불필요)이고, 모델 가중치도
 // npm install/모델 다운로드 모두 로그인 없는 익명 다운로드로 받는다(scripts/download-model.js).
 // 부가 이점: 완전 오프라인 동작 — T-8(랜선 뽑고 데모) 요구사항과도 정확히 맞아떨어진다.
-const path = require("path");
 const fs = require("fs");
-
-const MODEL_PATH = path.join(__dirname, "..", "..", "models", "qwen2.5-1.5b-instruct-q8_0.gguf");
+const { MODEL_PATH } = require("../modelDownloader");
 
 let sessionPromise = null;
 

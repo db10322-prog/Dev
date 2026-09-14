@@ -36,5 +36,48 @@
   "allowScripts": {
     "electron@31.7.7": true,
     "node-llama-cpp@3.20.0": true
+  },
+  "build": {
+    "appId": "com.fakenewsagent.app",
+    "productName": "뉴스 판별 에이전트",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "app/**/*",
+      "core/**/*",
+      "data/**/*",
+      "native-host/**/*",
+      "installer/**/*",
+      "scripts/**/*",
+      "cli.js",
+      "package.json",
+      "node_modules/**/*",
+      "!node_modules/@node-llama-cpp/win-arm64/**",
+      "!node_modules/@node-llama-cpp/win-x64-cuda/**",
+      "!node_modules/@node-llama-cpp/win-x64-cuda-ext/**",
+      "!node_modules/@node-llama-cpp/win-x64-vulkan/**",
+      "!**/*.md",
+      "!spike/**",
+      "!eval/**",
+      "!web/**",
+      "!models/**",
+      "!cache/**",
+      "!.git/**"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "app/character/app-icon.png",
+      "signAndEditExecutable": false,
+      "verifyUpdateCodeSignature": false,
+      "artifactName": "NewsVerdictAgent-Setup.exe"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "artifactName": "뉴스판별에이전트-설치.exe"
+    }
   }
 }

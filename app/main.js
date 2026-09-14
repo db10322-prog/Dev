@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage } = require("electron");
 const WebSocket = require("ws");
 const { analyzeArticle } = require("../core/pipeline");
+const { ensureModelDownloaded, isModelReady } = require("../core/modelDownloader");
 
 const WS_PORT = process.env.NATIVE_HOST_HTTP_PORT || 5757;
 const ENV_PATH = path.join(__dirname, "..", ".env");
@@ -14,6 +15,7 @@ const SETTINGS_KEYS = ["MISTRAL_API_KEY", "GEMINI_API_KEY", "GROQ_API_KEY", "NAV
 let characterWindow = null;
 let reportWindow = null;
 let settingsWindow = null;
+let setupWindow = null;
 let tray = null;
 let isQuitting = false;
 let wss = null;
@@ -227,12 +229,46 @@ ipcMain.handle("save-settings", (_event, values) => {
   return { ok: true };
 });
 
-app.whenReady().then(() => {
+/** 배포용 실행파일에는 2GB 모델을 안 담았음 — 첫 실행 시 진행률 창을 띄우고 내려받는다.
+ * 계정/로그인 불필요라 사용자가 터미널을 열 필요가 전혀 없다. */
+function createSetupWindow() {
+  setupWindow = new BrowserWindow({
+    width: 420,
+    height: 340,
+    frame: false,
+    resizable: false,
+    webPreferences: {
+      preload: path.join(__dirname, "character", "preload.js"),
+      contextIsolation: true,
+    },
+  });
+  setupWindow.loadFile(path.join(__dirname, "renderer", "setup.html"));
+}
+
+async function startApp() {
   startNativeBridgeServer();
+
+  if (!isModelReady()) {
+    createSetupWindow();
+    try {
+      await ensureModelDownloaded((progress) => {
+        setupWindow?.webContents.send("setup-progress", progress);
+      });
+    } catch (err) {
+      setupWindow?.webContents.send("setup-progress", { error: err.message });
+      // 실패해도 앱은 계속 띄운다 — Mistral/Gemini/Groq 키가 있으면 그걸로 동작 가능하고,
+      // 설정 화면에서 나중에 키를 넣거나 재시도할 수 있게 캐릭터까지는 띄워준다.
+    }
+    setupWindow?.close();
+    setupWindow = null;
+  }
+
   createCharacterWindow();
   createReportWindow();
   createTray();
-});
+}
+
+app.whenReady().then(startApp);
 
 // 트레이 상주 앱이므로 모든 창이 닫혀도 프로세스는 유지 — 종료는 트레이 메뉴에서만.
 app.on("window-all-closed", (event) => {
