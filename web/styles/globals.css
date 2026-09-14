@@ -80,23 +80,36 @@ a { color: inherit; text-decoration: none; }
 img, svg { max-width: 100%; }
 button { font-family: inherit; }
 
-.container { max-width: var(--max-w); margin: 0 auto; padding-inline: 20px; }
-@media (min-width: 640px) { .container { padding-inline: 32px; } }
+.container {
+  max-width: var(--max-w); margin: 0 auto;
+  /* viewport-fit=cover라 노치/펀치홀 기기 가로모드에서 콘텐츠가 잘리지 않도록 안전 영역 확보 */
+  padding-inline: max(20px, env(safe-area-inset-left)) max(20px, env(safe-area-inset-right));
+}
+@media (min-width: 640px) {
+  .container { padding-inline: max(32px, env(safe-area-inset-left)) max(32px, env(safe-area-inset-right)); }
+}
 
 /* ---- nav ---- */
 .nav {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 12px;
   padding-block: 18px; position: sticky; top: 0; z-index: 20;
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid transparent;
 }
 .nav.scrolled { border-bottom-color: var(--border); }
-.nav .logo { font-weight: 800; font-size: 16px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.01em; }
+.nav .logo {
+  font-weight: 800; font-size: 16px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.01em;
+  min-width: 0; /* 좁은 화면에서 flex 아이템이 자식 텍스트 너비 때문에 잘리지 않고 줄바꿈되게 함 */
+}
 .nav .logo-icon { width: 26px; height: 26px; flex: none; }
 .nav a.cta {
   background: var(--ink); color: var(--bg); padding: 9px 18px; border-radius: 999px;
-  font-weight: 700; font-size: 13.5px;
+  font-weight: 700; font-size: 13.5px; flex: none;
+}
+@media (max-width: 360px) {
+  .nav .logo { font-size: 14px; }
+  .nav a.cta { padding: 8px 14px; font-size: 12.5px; }
 }
 
 /* ---- hero ---- */
