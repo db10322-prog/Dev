@@ -17,6 +17,22 @@
 // core/pipeline.js 및 core/agents/comments.js 에서 공용으로 사용.
 const fetch = require("node-fetch");
 
+// 무료/저사양 티어에서 흔한 429(rate limit)는 "실패"가 아니라 "잠깐 기다렸다 다시 보내라"는 신호다.
+// Retry-After 헤더가 있으면 그 시간만큼, 없으면 짧게 기본값만큼 기다렸다가 딱 한 번 더 시도한다
+// (그래도 20초 목표 예산이 있어서 무한 재시도는 안 함 — 그래도 안 되면 다음 provider/로컬로 넘어감).
+async function fetchWithRateLimitRetry(url, options, { maxRetries = 1, defaultDelayMs = 2000, maxDelayMs = 5000 } = {}) {
+  let res;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    res = await fetch(url, options);
+    if (res.status !== 429 || attempt === maxRetries) return res;
+    const retryAfter = res.headers.get("retry-after");
+    const waitMs = retryAfter ? Math.min(Number(retryAfter) * 1000, maxDelayMs) : defaultDelayMs;
+    console.warn(`[llm] 429 rate limited — ${waitMs}ms 대기 후 재시도 (${attempt + 1}/${maxRetries})`);
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
+  }
+  return res;
+}
+
 // 로컬 모델은 Electron 데스크톱 환경 전용 — Vercel 서버리스(Linux, 모델 파일도 없음)에서는
 // 절대 로드하면 안 된다(실제로 빌드가 깨지는 걸 겪었음). require를 지연시켜서 이 모듈이
 // Vercel 번들에 아예 딸려 들어가지 않게 하고, callLocalLlmJson()도 VERCEL 환경변수가 있으면
@@ -39,7 +55,7 @@ async function callMistral({ prompt, responseSchema, apiKey, model }) {
     ? { type: "json_schema", json_schema: { name: "verdict_report", schema: responseSchema, strict: true } }
     : { type: "json_object" };
 
-  const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
+  const res = await fetchWithRateLimitRetry("https://api.mistral.ai/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -69,7 +85,7 @@ async function callGemini({ prompt, responseSchema, apiKey, model }) {
   if (!key) throw new Error("GEMINI_API_KEY 없음");
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${key}`;
-  const res = await fetch(url, {
+  const res = await fetchWithRateLimitRetry(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -97,7 +113,7 @@ async function callGroq({ prompt, apiKey, model }) {
   const modelName = model || process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
   if (!key) throw new Error("GROQ_API_KEY 없음");
 
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+  const res = await fetchWithRateLimitRetry("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
