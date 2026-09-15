@@ -1,23 +1,28 @@
-// app/character/index.html 의 SVG 캐릭터를 랜딩 페이지 히어로용으로 재사용(참고 이미지의 흰색/검정 로봇 + 파란 링 눈 재현).
+// app/character/index.html의 캐릭터를 랜딩 페이지용으로 재사용. 흰 로봇 머리+시안 링눈 조합은
+// AI 생성 이미지에서 흔한 클리셰라 리디자인함 — 종이 크림색 블롭 실루엣 + 비대칭 눈(한쪽 윙크) +
+// 기울어진 안테나 하나 + 돋보기를 든 팔 하나로, 사람이 그린 마스코트에 가깝게 만듦.
 export default function CharacterIllustration() {
   return (
-    <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
-      <rect x="62" y="128" width="76" height="62" rx="20" fill="#fff" stroke="#1c1f26" strokeWidth="2" />
-      <circle cx="70" cy="140" r="6" fill="#14161b" />
-      <circle cx="100" cy="160" r="7" fill="#3182f6" />
-      <rect x="34" y="140" width="20" height="46" rx="10" fill="#fff" stroke="#1c1f26" strokeWidth="2" />
-      <rect x="146" y="140" width="20" height="46" rx="10" fill="#fff" stroke="#1c1f26" strokeWidth="2" />
-      <circle cx="44" cy="188" r="9" fill="#14161b" />
-      <circle cx="156" cy="188" r="9" fill="#14161b" />
-      <rect x="72" y="186" width="18" height="26" rx="8" fill="#fff" stroke="#1c1f26" strokeWidth="2" />
-      <rect x="110" y="186" width="18" height="26" rx="8" fill="#fff" stroke="#1c1f26" strokeWidth="2" />
-      <ellipse cx="81" cy="214" rx="14" ry="7" fill="#14161b" />
-      <ellipse cx="119" cy="214" rx="14" ry="7" fill="#14161b" />
-      <circle cx="100" cy="70" r="62" fill="#fff" stroke="#1c1f26" strokeWidth="2" />
-      <path d="M45 55 a55 55 0 0 1 110 0 a55 65 0 0 1 -110 0 z" fill="#14161b" />
-      <circle cx="76" cy="58" r="16" fill="none" stroke="#2fd0ff" strokeWidth="5" />
-      <circle cx="122" cy="58" r="12" fill="none" stroke="#2fd0ff" strokeWidth="4" />
-      <circle cx="100" cy="18" r="5" fill="#14161b" />
+    <svg viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="74" cy="196" rx="17" ry="9" fill="#20232b" />
+      <ellipse cx="124" cy="198" rx="14" ry="8" fill="#20232b" />
+
+      <ellipse cx="100" cy="112" rx="74" ry="72" fill="#f6ecd9" stroke="#20232b" strokeWidth="4" />
+
+      <path d="M34 120 q-13 7 -13 23" fill="none" stroke="#20232b" strokeWidth="10" strokeLinecap="round" />
+      <path d="M158 130 q20 6 24 27" fill="none" stroke="#20232b" strokeWidth="10" strokeLinecap="round" />
+      <circle cx="183" cy="161" r="8" fill="#20232b" />
+      <line x1="191" y1="144" x2="200" y2="156" stroke="#e2572c" strokeWidth="6" strokeLinecap="round" />
+      <circle cx="180" cy="130" r="15" fill="#f6ecd9" stroke="#e2572c" strokeWidth="5" />
+
+      <circle cx="76" cy="101" r="7" fill="#20232b" />
+      <path d="M112 105 q10 -12 22 -2" fill="none" stroke="#20232b" strokeWidth="6.5" strokeLinecap="round" />
+      <circle cx="62" cy="121" r="9" fill="#e2572c" opacity="0.32" />
+      <circle cx="132" cy="123" r="9" fill="#e2572c" opacity="0.32" />
+      <path d="M84 131 q16 14 34 2" fill="none" stroke="#20232b" strokeWidth="5" strokeLinecap="round" />
+
+      <path d="M96 42 q10 -26 28 -22" fill="none" stroke="#20232b" strokeWidth="6" strokeLinecap="round" />
+      <circle cx="126" cy="19" r="8" fill="#e2572c" />
     </svg>
   );
 }

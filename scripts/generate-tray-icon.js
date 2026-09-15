@@ -1,5 +1,6 @@
 // 트레이 아이콘을 외부 이미지 도구 없이 순수 Node로 생성 (zlib만 사용, PNG 스펙 직접 작성).
-// 캐릭터(app/character/index.html)의 검정 바이저 + 파란 링 눈을 32x32 축소판으로 재현.
+// 캐릭터 리디자인판(app/character/index.html 참고) — 종이 크림색 블롭 + 비대칭 눈(왼쪽 크게,
+// 오른쪽 작게) + 블러시 + 한쪽으로 기운 안테나 하나. 32x32라 팔/돋보기는 생략(너무 작아 뭉개짐).
 const fs = require("fs");
 const path = require("path");
 const zlib = require("zlib");
@@ -7,43 +8,54 @@ const zlib = require("zlib");
 const SIZE = 32;
 const OUT_PATH = path.join(__dirname, "..", "app", "character", "tray-icon.png");
 
-// RGBA 픽셀 버퍼 (투명 배경)
 const px = new Uint8Array(SIZE * SIZE * 4);
 function setPixel(x, y, r, g, b, a) {
   if (x < 0 || y < 0 || x >= SIZE || y >= SIZE) return;
   const i = (y * SIZE + x) * 4;
   px[i] = r; px[i + 1] = g; px[i + 2] = b; px[i + 3] = a;
 }
-function fillCircle(cx, cy, radius, r, g, b, a) {
+function fillEllipse(cx, cy, rx, ry, r, g, b, a) {
   for (let y = 0; y < SIZE; y++) {
     for (let x = 0; x < SIZE; x++) {
-      const dx = x - cx, dy = y - cy;
-      if (dx * dx + dy * dy <= radius * radius) setPixel(x, y, r, g, b, a);
+      const dx = (x - cx) / rx, dy = (y - cy) / ry;
+      if (dx * dx + dy * dy <= 1) setPixel(x, y, r, g, b, a);
     }
   }
 }
-function fillCircleRing(cx, cy, outerR, innerR, r, g, b, a) {
+function fillThickLine(x0, y0, x1, y1, thickness, r, g, b, a) {
+  const radius = thickness / 2;
+  const dx = x1 - x0, dy = y1 - y0;
+  const lenSq = dx * dx + dy * dy || 1;
   for (let y = 0; y < SIZE; y++) {
     for (let x = 0; x < SIZE; x++) {
-      const dx = x - cx, dy = y - cy;
-      const d2 = dx * dx + dy * dy;
-      if (d2 <= outerR * outerR && d2 >= innerR * innerR) setPixel(x, y, r, g, b, a);
+      let t = ((x - x0) * dx + (y - y0) * dy) / lenSq;
+      t = Math.max(0, Math.min(1, t));
+      const px_ = x0 + t * dx, py_ = y0 + t * dy;
+      const ddx = x - px_, ddy = y - py_;
+      if (ddx * ddx + ddy * ddy <= radius * radius) setPixel(x, y, r, g, b, a);
     }
   }
 }
 
-// 흰색 머리 바깥 원
-fillCircle(16, 16, 15, 255, 255, 255, 255);
-// 검정 바이저(눈 부분 가로 밴드)
-for (let y = 9; y <= 18; y++) {
-  for (let x = 4; x <= 27; x++) {
-    const dx = x - 16, dy = y - 16;
-    if (dx * dx + dy * dy <= 15 * 15) setPixel(x, y, 20, 22, 27, 255);
-  }
-}
-// 파란 링 눈 2개 (참고 이미지의 시안 블루 링 눈)
-fillCircleRing(11, 13, 4, 2, 47, 208, 255, 255);
-fillCircleRing(20, 13, 3, 1.5, 47, 208, 255, 255);
+// 팔레트: 종이 크림 / 잉크 / 도장 빨강 — 흰색+시안 로봇 팔레트에서 완전히 벗어남.
+const INK = [32, 35, 43];
+const CREAM = [246, 236, 217];
+const ACCENT = [226, 87, 44];
+
+// 몸통(잉크색 큰 타원 → 크림색 작은 타원으로 "테두리" 효과)
+fillEllipse(16, 18, 13.5, 13, ...INK, 255);
+fillEllipse(16, 18, 11, 10.5, ...CREAM, 255);
+
+// 안테나(오른쪽으로 살짝 기움) + 포인트 컬러 끝
+fillThickLine(15, 7, 19, 3, 2.6, ...INK, 255);
+fillEllipse(19.5, 2.5, 1.6, 1.6, ...ACCENT, 255);
+
+// 눈(비대칭 — 왼쪽이 더 큼)
+fillEllipse(12, 16, 1.7, 1.7, ...INK, 255);
+fillEllipse(20, 16.5, 1.1, 1.1, ...INK, 255);
+// 블러시
+fillEllipse(9.5, 19.5, 1.4, 1.4, ...ACCENT, 90);
+fillEllipse(22, 20, 1.4, 1.4, ...ACCENT, 90);
 
 // ---- PNG 인코딩 ----
 function crc32(buf) {

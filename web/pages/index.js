@@ -2,28 +2,29 @@ import Link from "next/link";
 import CharacterIllustration from "../components/CharacterIllustration";
 import ReportPreviewMockup from "../components/ReportPreviewMockup";
 import CopyLinkButton from "../components/CopyLinkButton";
+import { VerdictIcon, CrossCheckIcon, BiasIcon, OpinionIcon, DesktopOnlyIcon } from "../components/FeatureIcons";
 
 const DOWNLOAD_URL = "https://github.com/db10322-prog/Dev/releases/latest/download/NewsVerdictAgent-Setup.exe";
 const REPO_URL = "https://github.com/db10322-prog/Dev";
 
 const FEATURES = [
   {
-    emoji: "🔍",
+    Icon: VerdictIcon,
     title: "4단계 진위 판정 + 근거",
     desc: "가짜/진짜 이분법 대신 검증됨·대체로 사실·근거 불충분·사실과 다름 4단계로 판정하고, 판단 근거를 3줄 이상 함께 보여줍니다.",
   },
   {
-    emoji: "📰",
+    Icon: CrossCheckIcon,
     title: "타 언론사 교차검증",
     desc: "네이버 뉴스 검색 + Google Fact Check API로 같은 사안을 다룬 다른 매체 기사를 찾아 제목·매체·링크와 함께 제시합니다.",
   },
   {
-    emoji: "⚖️",
+    Icon: BiasIcon,
     title: "편향 방향 + 반대 성향 기사",
     desc: "매체 성향 매핑(출처 공개)과 텍스트 프레이밍 분석을 분리 표시하고, 반대 성향 매체의 기사를 나란히 보여줍니다.",
   },
   {
-    emoji: "💬",
+    Icon: OpinionIcon,
     title: "댓글 여론 요약",
     desc: "찬반 비율과 주요 논점을 요약해서 보여주되, 댓글 원문이나 작성자 정보는 노출하지 않습니다.",
   },
@@ -70,7 +71,7 @@ export default function Home() {
             <p className="btn-hint">클릭하면 설치 파일이 바로 다운로드됩니다 · 약 110MB</p>
 
             <div className="pc-only-notice">
-              <span className="glyph">💻</span>
+              <span className="glyph"><DesktopOnlyIcon width={18} height={18} /></span>
               <div>
                 <strong>캐릭터 앱은 PC 전용입니다</strong>
                 <p>바탕화면 캐릭터 + 크롬 확장 조합은 휴대폰에 설치·실행할 수 없어요(OS 정책상 불가능). 대신 아래 버튼으로 지금 바로 휴대폰에서 기사 링크를 분석해볼 수 있습니다.</p>
@@ -97,7 +98,7 @@ export default function Home() {
           <div className="card-grid">
             {FEATURES.map((f) => (
               <div className="feature-card" key={f.title}>
-                <span className="emoji">{f.emoji}</span>
+                <span className="emoji"><f.Icon width={20} height={20} /></span>
                 <h3>{f.title}</h3>
                 <p>{f.desc}</p>
               </div>

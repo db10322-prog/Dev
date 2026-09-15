@@ -12,9 +12,12 @@
      Electron은 창 밖으로 나간 내용을 스크롤 없이 그냥 잘라버림. */
   #stage { position: relative; width: 240px; height: 340px; }
 
-  /* 참고 이미지(둥근 흰색/검정 로봇 헤드 + 파란 링 눈)를 SVG로 재현한 캐릭터 */
+  /* 캐릭터 리디자인 — "흰 로봇 머리 + 시안 링눈" 조합은 AI 생성 이미지에서 흔한 클리셰라
+     완전히 갈아엎음. 대신: 종이/돋보기 모티프의 단일 블롭 실루엣 + 비대칭 눈(한쪽은 윙크) +
+     한쪽으로 기운 안테나 하나("설명 가능한 결함") + 돋보기를 든 팔 하나(반대팔은 그냥 대기).
+     색도 흰색+시안 대신 종이 크림색 + 잉크색 + 도장 빨강 한 가지 포인트로 제한. */
   #character {
-    position: absolute; bottom: 8px; right: 8px; width: 108px; height: 108px;
+    position: absolute; bottom: 8px; right: 8px; width: 108px; height: 113px;
     cursor: pointer; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
   }
   @keyframes float {
@@ -23,22 +26,27 @@
   }
   @keyframes blink {
     0%, 92%, 100% { opacity: 1; }
-    96% { opacity: .35; }
+    96% { opacity: .25; }
   }
-  #character:hover .head { fill: #f5f6f8; }
-  #character.thinking .eye-ring { animation: pulse 0.8s ease-in-out infinite; }
+  #character:hover .blob { fill: #faf3e3; }
+  #character.thinking .glass-lens { animation: pulse 0.8s ease-in-out infinite; }
   @keyframes pulse {
     0%, 100% { opacity: 1; }
-    50% { opacity: .4; }
+    50% { opacity: .35; }
   }
 
-  .head { fill: #ffffff; stroke: #1c1f26; stroke-width: 2; transition: fill .15s; }
-  .visor { fill: #14161b; }
-  .eye-ring { fill: none; stroke: #2fd0ff; stroke-width: 5; animation: blink 4s infinite; }
-  .eye-ring.small { stroke-width: 4; }
-  .body-torso { fill: #ffffff; stroke: #1c1f26; stroke-width: 2; }
-  .joint { fill: #14161b; }
-  .accent { fill: #2fd0ff; }
+  .blob { fill: #f6ecd9; stroke: #20232b; stroke-width: 4; transition: fill .15s; }
+  .foot { fill: #20232b; }
+  .arm-stub, .arm-active { fill: none; stroke: #20232b; stroke-width: 10; stroke-linecap: round; }
+  .hand { fill: #20232b; }
+  .glass-lens { fill: #f6ecd9; stroke: #e2572c; stroke-width: 5; }
+  .glass-handle { stroke: #e2572c; stroke-width: 6; stroke-linecap: round; }
+  .eye { fill: none; stroke: #20232b; stroke-width: 6.5; stroke-linecap: round; animation: blink 4.2s infinite; }
+  .eye.dot { fill: #20232b; stroke: none; }
+  .blush { fill: #e2572c; opacity: .32; }
+  .mouth { fill: none; stroke: #20232b; stroke-width: 5; stroke-linecap: round; }
+  .antenna-line { fill: none; stroke: #20232b; stroke-width: 6; stroke-linecap: round; }
+  .antenna-tip { fill: #e2572c; }
 
   #bubble {
     position: absolute; bottom: 128px; right: 0; width: 210px;
@@ -69,28 +77,32 @@
     <div id="status"></div>
   </div>
 
-  <svg id="character" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
-    <!-- 몸통 -->
-    <rect class="body-torso" x="62" y="128" width="76" height="62" rx="20" />
-    <circle class="joint" cx="70" cy="140" r="6" />
-    <circle class="accent" cx="100" cy="160" r="7" />
-    <!-- 팔 -->
-    <rect class="body-torso" x="34" y="140" width="20" height="46" rx="10" />
-    <rect class="body-torso" x="146" y="140" width="20" height="46" rx="10" />
-    <circle class="joint" cx="44" cy="188" r="9" />
-    <circle class="joint" cx="156" cy="188" r="9" />
-    <!-- 다리 -->
-    <rect class="body-torso" x="72" y="186" width="18" height="26" rx="8" />
-    <rect class="body-torso" x="110" y="186" width="18" height="26" rx="8" />
-    <ellipse class="joint" cx="81" cy="214" rx="14" ry="7" />
-    <ellipse class="joint" cx="119" cy="214" rx="14" ry="7" />
+  <svg id="character" viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+    <!-- 발(비대칭 — 왼쪽이 조금 더 큼) -->
+    <ellipse class="foot" cx="74" cy="196" rx="17" ry="9" />
+    <ellipse class="foot" cx="124" cy="198" rx="14" ry="8" />
 
-    <!-- 머리 -->
-    <circle class="head" cx="100" cy="70" r="62" />
-    <path class="visor" d="M45 55 a55 55 0 0 1 110 0 a55 65 0 0 1 -110 0 z" />
-    <circle class="eye-ring" cx="76" cy="58" r="16" />
-    <circle class="eye-ring small" cx="122" cy="58" r="12" />
-    <circle class="joint" cx="100" cy="18" r="5" />
+    <!-- 몸통+머리 한 덩어리(블롭) — 로봇 관절 조립 대신 단일 실루엣 -->
+    <ellipse class="blob" cx="100" cy="112" rx="74" ry="72" />
+
+    <!-- 왼팔: 그냥 대기 중인 짧은 스텁 -->
+    <path class="arm-stub" d="M34 120 q-13 7 -13 23" />
+    <!-- 오른팔: 돋보기를 든 활성 팔 -->
+    <path class="arm-active" d="M158 130 q20 6 24 27" />
+    <circle class="hand" cx="183" cy="161" r="8" />
+    <line class="glass-handle" x1="191" y1="144" x2="200" y2="156" />
+    <circle class="glass-lens" cx="180" cy="130" r="15" />
+
+    <!-- 얼굴: 왼쪽은 뜬 눈(점), 오른쪽은 윙크(곡선) — 의도적 비대칭 -->
+    <circle class="eye dot" cx="76" cy="101" r="7" />
+    <path class="eye" d="M112 105 q10 -12 22 -2" />
+    <circle class="blush" cx="62" cy="121" r="9" />
+    <circle class="blush" cx="132" cy="123" r="9" />
+    <path class="mouth" d="M84 131 q16 14 34 2" />
+
+    <!-- 안테나 하나, 한쪽으로 기울어짐 + 포인트 컬러 끝 -->
+    <path class="antenna-line" d="M96 42 q10 -26 28 -22" />
+    <circle class="antenna-tip" cx="126" cy="19" r="8" />
   </svg>
 </div>
 <script src="renderer.js"></script>
