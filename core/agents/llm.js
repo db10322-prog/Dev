@@ -140,6 +140,11 @@ async function callLLMJson({ prompt, responseSchema }) {
     { name: "groq", key: process.env.GROQ_API_KEY, call: () => callGroq({ prompt }) },
   ];
 
+  // 클라우드 경로 중 "키가 있는데 호출 자체가 실패한" 마지막 에러를 따로 기록해둔다 — 전부 실패해서
+  // 로컬 모델로 넘어갔는데 그마저 실패하면(Vercel엔 로컬 모델이 아예 없음), 밑에서 항상
+  // "키를 설정하세요"라는 로컬 모델의 일반 메시지만 던져서 실제 원인(레이트리밋/모델 접근 권한 등)이
+  // 안 보이는 문제가 있었다 — 실제로 이 프로젝트 배포본에서 겪은 문제.
+  let lastCloudError = null;
   for (let i = 0; i < chain.length; i++) {
     const { name, key, call } = chain[i];
     if (!key) continue;
@@ -148,11 +153,21 @@ async function callLLMJson({ prompt, responseSchema }) {
       return { json: extractJson(text), modelUsed, usedFallback: i > 0 };
     } catch (err) {
       console.warn(`[llm] ${name} 사용 불가(${err.message}) — 다음 경로 시도`);
+      lastCloudError = { name, err };
     }
   }
 
-  const { json, modelUsed } = await callLocalLlmJson({ prompt, responseSchema });
-  return { json, modelUsed, usedFallback: chain.some((c) => c.key) };
+  try {
+    const { json, modelUsed } = await callLocalLlmJson({ prompt, responseSchema });
+    return { json, modelUsed, usedFallback: chain.some((c) => c.key) };
+  } catch (localErr) {
+    if (lastCloudError) {
+      throw new Error(
+        `${lastCloudError.name} 호출 실패: ${lastCloudError.err.message} (로컬 모델도 사용 불가: ${localErr.message})`
+      );
+    }
+    throw localErr;
+  }
 }
 
 module.exports = { callLLMJson, callMistral, callGemini, callGroq, callLocalLlmJson, extractJson };
