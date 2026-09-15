@@ -151,6 +151,10 @@ async function callZai({ prompt, apiKey, model }) {
         { role: "user", content: prompt },
       ],
       response_format: { type: "json_object" },
+      // GLM-4.5/4.6 계열은 기본이 "thinking"(추론) 모드라 실제로 붙여보니 판정 1건에 137초가
+      // 걸렸음(20초 목표를 크게 초과) — 체인 오브 쏘트를 끄면 훨씬 빨라진다. (GLM-5.3/5.3-flash는
+      // thinking을 강제라 이 옵션이 안 먹지만, 기본값 glm-4.5-flash에는 적용됨.)
+      thinking: { type: "disabled" },
     }),
   });
   if (!res.ok) {

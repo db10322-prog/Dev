@@ -50,6 +50,7 @@ async function probeZai() {
         { role: "user", content: 'Reply with exactly this JSON object: {"ok": true}' },
       ],
       response_format: { type: "json_object" },
+      thinking: { type: "disabled" },
     }),
   });
   const bodyText = await r.text();
