@@ -18,6 +18,25 @@ async function probeMistral() {
   return { hasKey: true, keyLen: key.length, status: r.status, retryAfter: r.headers.get("retry-after"), body: bodyText.slice(0, 400) };
 }
 
+async function probeDeepSeek() {
+  const key = process.env.DEEPSEEK_API_KEY;
+  if (!key) return { hasKey: false };
+  const r = await fetch("https://api.deepseek.com/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: process.env.DEEPSEEK_MODEL || "deepseek-chat",
+      messages: [
+        { role: "system", content: "You must respond with valid JSON only, no prose, no markdown fences." },
+        { role: "user", content: 'Reply with exactly this JSON object: {"ok": true}' },
+      ],
+      response_format: { type: "json_object" },
+    }),
+  });
+  const bodyText = await r.text();
+  return { hasKey: true, keyLen: key.length, status: r.status, retryAfter: r.headers.get("retry-after"), body: bodyText.slice(0, 400) };
+}
+
 async function probeHuggingFace() {
   const key = process.env.HF_API_KEY;
   if (!key) return { hasKey: false };
@@ -56,8 +75,9 @@ async function probeSambaNova() {
 }
 
 export default async function handler(req, res) {
-  const [mistral, huggingface, sambanova] = await Promise.all([
+  const [mistral, deepseek, huggingface, sambanova] = await Promise.all([
     probeMistral().catch((e) => ({ fetchError: String(e.message || e) })),
+    probeDeepSeek().catch((e) => ({ fetchError: String(e.message || e) })),
     probeHuggingFace().catch((e) => ({ fetchError: String(e.message || e) })),
     probeSambaNova().catch((e) => ({ fetchError: String(e.message || e) })),
   ]);
@@ -66,6 +86,7 @@ export default async function handler(req, res) {
     hasGemini: Boolean(process.env.GEMINI_API_KEY),
     hasGroq: Boolean(process.env.GROQ_API_KEY),
     mistral,
+    deepseek,
     huggingface,
     sambanova,
   });
