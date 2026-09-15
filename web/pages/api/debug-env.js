@@ -36,10 +36,30 @@ async function probeHuggingFace() {
   return { hasKey: true, keyLen: key.length, status: r.status, retryAfter: r.headers.get("retry-after"), body: bodyText.slice(0, 400) };
 }
 
+async function probeSambaNova() {
+  const key = process.env.SAMBANOVA_API_KEY;
+  if (!key) return { hasKey: false };
+  const r = await fetch("https://api.sambanova.ai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: process.env.SAMBANOVA_MODEL || "Meta-Llama-3.3-70B-Instruct",
+      messages: [
+        { role: "system", content: "You must respond with valid JSON only, no prose, no markdown fences." },
+        { role: "user", content: 'Reply with exactly this JSON object: {"ok": true}' },
+      ],
+      response_format: { type: "json_object" },
+    }),
+  });
+  const bodyText = await r.text();
+  return { hasKey: true, keyLen: key.length, status: r.status, retryAfter: r.headers.get("retry-after"), body: bodyText.slice(0, 400) };
+}
+
 export default async function handler(req, res) {
-  const [mistral, huggingface] = await Promise.all([
+  const [mistral, huggingface, sambanova] = await Promise.all([
     probeMistral().catch((e) => ({ fetchError: String(e.message || e) })),
     probeHuggingFace().catch((e) => ({ fetchError: String(e.message || e) })),
+    probeSambaNova().catch((e) => ({ fetchError: String(e.message || e) })),
   ]);
   res.status(200).json({
     vercelEnv: process.env.VERCEL_ENV || null,
@@ -47,5 +67,6 @@ export default async function handler(req, res) {
     hasGroq: Boolean(process.env.GROQ_API_KEY),
     mistral,
     huggingface,
+    sambanova,
   });
 }
