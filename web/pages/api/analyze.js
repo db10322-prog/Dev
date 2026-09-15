@@ -4,6 +4,10 @@
 // 오프라인 리허설(T-8) 요구사항 때문에 클라우드 의존을 기본값으로 두지 않음.
 const { analyzeArticle } = require("../../../core/pipeline");
 
+// analyze-url.js와 같은 이유 — 폴백 체인 뒤쪽 provider가 느릴 때 플랜 기본 제한에 일찍 잘리지
+// 않도록 명시적으로 최대치를 요청.
+export const config = { maxDuration: 300 };
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.status(405).json({ error: "POST만 지원" });

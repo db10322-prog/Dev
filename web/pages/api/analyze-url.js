@@ -7,6 +7,11 @@
 const { fetchArticleFullText } = require("../../../core/agents/articleFetch");
 const { analyzeArticle } = require("../../../core/pipeline");
 
+// 폴백 체인 뒤쪽 provider(특히 응답이 느린 곳)로 넘어가면 20초 목표를 훌쩍 넘길 수 있어서,
+// Vercel이 플랜 한도 안에서 허용하는 최대치를 명시적으로 요청해둔다(실측: 정상 판정 1건에
+// 137초가 걸린 사례가 있었음 — 이 값이 없으면 플랜 기본값에서 일찍 잘릴 위험이 있다).
+export const config = { maxDuration: 300 };
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.status(405).json({ error: "POST만 지원" });

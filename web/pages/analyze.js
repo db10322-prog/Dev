@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ReportView from "../components/ReportView";
 
@@ -12,6 +12,18 @@ export default function Analyze() {
   const [status, setStatus] = useState("idle"); // idle | loading | error | done
   const [error, setError] = useState("");
   const [report, setReport] = useState(null);
+  const [elapsedSec, setElapsedSec] = useState(0);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (status !== "loading") {
+      clearInterval(timerRef.current);
+      return;
+    }
+    setElapsedSec(0);
+    timerRef.current = setInterval(() => setElapsedSec((s) => s + 1), 1000);
+    return () => clearInterval(timerRef.current);
+  }, [status]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -64,12 +76,22 @@ export default function Analyze() {
           {status === "loading" ? "분석 중…" : "분석하기"}
         </button>
       </form>
-      <p className="analyze-hint">기사 원문 링크를 그대로 붙여넣어주세요. 보통 10~30초 정도 걸립니다.</p>
+      <p className="analyze-hint">
+        기사 원문 링크를 그대로 붙여넣어주세요. 보통 10~30초, 상황에 따라 최대 2분 가까이 걸릴 수 있어요.
+      </p>
 
       {status === "loading" && (
         <div className="analyze-status">
           <span className="analyze-spinner" />
-          본문 추출 → 교차검증(뉴스 검색·팩트체크) → 편향·진위 판정 순서로 진행 중입니다…
+          <span>
+            본문 추출 → 교차검증(뉴스 검색·팩트체크) → 편향·진위 판정 순서로 진행 중입니다… ({elapsedSec}초)
+            {elapsedSec >= 15 && (
+              <>
+                <br />
+                예상보다 오래 걸리고 있어요 — 최대 2분까지 걸릴 수 있으니 페이지를 벗어나지 말고 조금만 더 기다려주세요.
+              </>
+            )}
+          </span>
         </div>
       )}
 
