@@ -1,7 +1,7 @@
 // 본체 AI 호출 래퍼.
 //
-// 우선순위: Mistral(있으면) → DeepSeek(있으면) → HuggingFace(있으면) → SambaNova(있으면) →
-// Gemini(있으면) → Groq(있으면) → 로컬 모델(항상 가능).
+// 우선순위: Mistral(있으면) → DeepSeek(있으면) → Z.ai/GLM(있으면) → HuggingFace(있으면) →
+// SambaNova(있으면) → Gemini(있으면) → Groq(있으면) → 로컬 모델(항상 가능).
 //
 // 왜 이 순서인가 — 전부 "무료 한도 안에서 최고 품질"을 미성년자도 실제로 쓸 수 있는 범위에서
 // 고른 것이다.
@@ -16,6 +16,10 @@
 //     쓸 수 있음. 신규 계정에 소량의 무료 크레딧을 줘서 카드 등록 없이도 당장 몇 번은 호출
 //     가능(정확한 금액/기간은 자주 바뀌므로 가입 후 대시보드에서 직접 확인할 것) — 다 쓰면
 //     카드 등록 없이는 더 이상 호출이 안 되니 그 시점부터는 사실상 못 쓰는 걸로 취급.
+//   - Z.ai(GLM, 국제 z.ai 포털): 약관 전체에 나이 하한선 자체가 없음(COPPA 관련 "13세 미만
+//     개인정보 처리 금지" 한 줄뿐, 이용 자격과는 무관 — 직접 확인함). 이메일 가입만으로 끝,
+//     전화번호도 카드도 불필요. GLM-4.5-flash 계열이 상시 무료(하루 1000건 수준으로 SambaNova/
+//     HuggingFace보다 넉넉함) — 그래서 HuggingFace보다 먼저 시도하도록 배치.
 //   - HuggingFace Inference Providers: 이용약관상 만 13세 이상, 전화번호 인증도 카드 등록도
 //     전혀 필요 없음(이메일 계정 가입 + 토큰 발급만으로 끝). 대신 무료 크레딧이 월 $0.10로
 //     매우 적어서(모델/제공자에 따라 다르지만 대략 수십~수백 회 호출 분량) 상시 운영보다는
@@ -27,10 +31,10 @@
 //   - Gemini / Groq: 둘 다 "계정 보유자가 만 18세 이상이어야 함"이 이용약관에 명시돼 있어
 //     미성년자가 본인 명의로는 발급 불가. 성인(부모님/선생님 등)이 대신 만들어준 키가 있을
 //     때만 선택적으로 사용.
-//   - 로컬 모델(core/agents/localLlm.js): 위 여섯 다 없어도 항상 동작하는 기본 바닥값. 계정도
+//   - 로컬 모델(core/agents/localLlm.js): 위 일곱 다 없어도 항상 동작하는 기본 바닥값. 계정도
 //     로그인도 이용약관 동의도 전혀 필요 없음(node-llama-cpp는 MIT, 모델은 Apache-2.0). 단
 //     Vercel 서버리스에서는 아예 비활성화돼 있음(아래 callLocalLlmJson 참고) — 그래서 모바일
-//     웹(/analyze) 경로는 이 여섯 중 최소 하나가 실제로 동작해야만 결과가 나온다.
+//     웹(/analyze) 경로는 이 일곱 중 최소 하나가 실제로 동작해야만 결과가 나온다.
 //
 // core/pipeline.js 및 core/agents/comments.js 에서 공용으로 사용.
 const fetch = require("node-fetch");
@@ -127,6 +131,38 @@ async function callDeepSeek({ prompt, apiKey, model }) {
   const text = data.choices?.[0]?.message?.content;
   if (!text) throw new Error("DeepSeek 응답에 텍스트 없음: " + JSON.stringify(data));
   return { text, raw: data, modelUsed: `deepseek:${modelName}` };
+}
+
+async function callZai({ prompt, apiKey, model }) {
+  const key = apiKey || process.env.ZAI_API_KEY;
+  const modelName = model || process.env.ZAI_MODEL || "glm-4.5-flash";
+  if (!key) throw new Error("ZAI_API_KEY 없음");
+
+  const res = await fetchWithRateLimitRetry("https://api.z.ai/api/paas/v4/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model: modelName,
+      messages: [
+        { role: "system", content: "You must respond with valid JSON only, no prose, no markdown fences." },
+        { role: "user", content: prompt },
+      ],
+      response_format: { type: "json_object" },
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    const err = new Error(`Z.ai ${res.status}: ${body}`);
+    err.status = res.status;
+    throw err;
+  }
+  const data = await res.json();
+  const text = data.choices?.[0]?.message?.content;
+  if (!text) throw new Error("Z.ai 응답에 텍스트 없음: " + JSON.stringify(data));
+  return { text, raw: data, modelUsed: `zai:${modelName}` };
 }
 
 async function callHuggingFace({ prompt, apiKey, model }) {
@@ -259,15 +295,16 @@ function extractJson(text) {
 
 /**
  * 구조화 JSON 출력을 강제하는 본체 AI 1회 호출.
- * 우선순위: Mistral → DeepSeek → HuggingFace → SambaNova → Gemini → Groq → 로컬 모델. 앞쪽이
- * 실패하거나 키가 없으면 다음으로 넘어가고, 아무 클라우드 키도 없으면 로컬 모델로 완전히
- * 동작한다(미성년자 기본 경로).
+ * 우선순위: Mistral → DeepSeek → Z.ai → HuggingFace → SambaNova → Gemini → Groq → 로컬 모델.
+ * 앞쪽이 실패하거나 키가 없으면 다음으로 넘어가고, 아무 클라우드 키도 없으면 로컬 모델로
+ * 완전히 동작한다(미성년자 기본 경로).
  * @returns {{ json: object, modelUsed: string, usedFallback: boolean }}
  */
 async function callLLMJson({ prompt, responseSchema }) {
   const chain = [
     { name: "mistral", key: process.env.MISTRAL_API_KEY, call: () => callMistral({ prompt, responseSchema }) },
     { name: "deepseek", key: process.env.DEEPSEEK_API_KEY, call: () => callDeepSeek({ prompt }) },
+    { name: "zai", key: process.env.ZAI_API_KEY, call: () => callZai({ prompt }) },
     { name: "huggingface", key: process.env.HF_API_KEY, call: () => callHuggingFace({ prompt }) },
     { name: "sambanova", key: process.env.SAMBANOVA_API_KEY, call: () => callSambaNova({ prompt }) },
     { name: "gemini", key: process.env.GEMINI_API_KEY, call: () => callGemini({ prompt, responseSchema }) },
@@ -308,6 +345,7 @@ module.exports = {
   callLLMJson,
   callMistral,
   callDeepSeek,
+  callZai,
   callHuggingFace,
   callSambaNova,
   callGemini,
